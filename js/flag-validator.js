@@ -20,19 +20,39 @@ const FlagValidator = {
         'logging-failures': 'q7r8s9t0'
     },
     
-    // Actual flags (for hash computation)
-    flags: {
-        'cryptographic-failures': 'CTF{Mul7i_L4y3r_3ncryp710n_F41l}',
-        'security-misconfiguration': 'CTF{0bfusc4t3d_S3cr3ts_Exp05ed}',
-        'steganography': 'CTF{H1dd3n_1n_Pl41n_S1ght}',
-        'insecure-design': 'CTF{R4c3_C0nd17i0n_Expl01t3d}',
-        'logging-failures': 'CTF{L0gg3d_S3ns1t1v3_D4t4}'
+    // Obfuscated flags (using same obfuscation as challenge files)
+    getFlag(challengeId) {
+        // Reconstruct flags using same obfuscation methods as challenge files
+        switch(challengeId) {
+            case 'cryptographic-failures':
+                // XOR cipher (key: 0x42) - stored as XORed values
+                const flagEncoded = [1,22,4,57,15,55,46,117,43,29,14,118,59,113,48,29,113,44,33,48,59,50,117,115,114,44,29,4,118,115,46,63];
+                return flagEncoded.map(c => String.fromCharCode(c ^ 0x42)).join('');
+            case 'security-misconfiguration':
+                // Base64 encoded
+                return atob('Q1RGezBiZnVzYzR0M2RfUzNjcjN0c19FeHAwNWVkfQ==');
+            case 'steganography':
+                // Character code array
+                const flagCodes = [67, 84, 70, 123, 72, 49, 100, 100, 51, 110, 95, 49, 110, 95, 80, 108, 52, 49, 110, 95, 83, 49, 103, 104, 116, 125];
+                return String.fromCharCode(...flagCodes);
+            case 'insecure-design':
+                // Split and join
+                return ['CTF{', 'R4c3_', 'C0nd1', '7i0n_', 'Expl0', '1t3d}'].join('');
+            case 'logging-failures':
+                // Reverse + Base64
+                return atob('fWR0NF9ldjEzdDNzX2QzZzMwTEZ7RlRD').split('').reverse().join('');
+            default:
+                return null;
+        }
     },
     
     init() {
-        // Compute hashes from actual flags
-        for (const [id, flag] of Object.entries(this.flags)) {
-            this.flagHashes[id] = this.hash(flag);
+        // Compute hashes from obfuscated flags
+        for (const id of Object.keys(this.flagHashes)) {
+            const flag = this.getFlag(id);
+            if (flag) {
+                this.flagHashes[id] = this.hash(flag);
+            }
         }
     },
     
@@ -50,7 +70,7 @@ const FlagValidator = {
         return {
             valid: isValid,
             message: isValid ? 'Correct flag! Challenge completed!' : 'Incorrect flag. Keep trying!',
-            flag: this.flags[challengeId]
+            flag: this.getFlag(challengeId)
         };
     }
 };

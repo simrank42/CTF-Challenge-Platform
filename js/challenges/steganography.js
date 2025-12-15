@@ -1,6 +1,8 @@
 // Steganography Challenge - Expert level with multiple techniques
 (function() {
-    const flag = 'CTF{H1dd3n_1n_Pl41n_S1ght}';
+    // Flag obfuscated as character code array
+    const flagCodes = [67, 84, 70, 123, 72, 49, 100, 100, 51, 110, 95, 49, 110, 95, 80, 108, 52, 49, 110, 95, 83, 49, 103, 104, 116, 125];
+    const flag = String.fromCharCode(...flagCodes);
     
     // Split flag into 3 parts
     const flagPart1 = flag.substring(0, 11);  // CTF{H1dd3n_

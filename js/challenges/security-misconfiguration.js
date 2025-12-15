@@ -1,6 +1,8 @@
 // Security Misconfiguration Challenge - Expert level with advanced obfuscation
 (function() {
-    const flag = 'CTF{0bfusc4t3d_S3cr3ts_Exp05ed}';
+    // Flag obfuscated with Base64 encoding
+    const flagB64 = 'Q1RGezBiZnVzYzR0M2RfUzNjcjN0c19FeHAwNWVkfQ==';
+    const flag = atob(flagB64);
     
     // Split flag into parts
     const flagPart1 = flag.substring(0, 12);  // CTF{0bfusc4
@@ -60,6 +62,28 @@
         console.warn('Exposed data:', config.metadata);
         
         return 'Configuration loaded. Analyze all properties carefully.';
+    };
+    
+    // Make executeObfuscatedCode available globally (before HTML tries to use it)
+    window.executeObfuscatedCode = function() {
+        const resultDiv = document.getElementById('execution-result');
+        if (!window.obfuscatedFunction) {
+            if (resultDiv) {
+                resultDiv.innerHTML = '<div class="flag-message error">Obfuscated function not loaded. Check the page source.</div>';
+            }
+            return;
+        }
+        
+        try {
+            const result = window.obfuscatedFunction();
+            if (resultDiv) {
+                resultDiv.innerHTML = `<div class="flag-message success">Execution result: ${result}</div>`;
+            }
+        } catch (e) {
+            if (resultDiv) {
+                resultDiv.innerHTML = `<div class="flag-message error">Error: ${e.message}</div>`;
+            }
+        }
     };
     
     // Display obfuscated code

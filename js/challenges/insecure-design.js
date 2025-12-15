@@ -1,6 +1,8 @@
 // Insecure Design Challenge - Expert level with complex race condition
 (function() {
-    const flag = 'CTF{R4c3_C0nd17i0n_Expl01t3d}';
+    // Flag obfuscated by splitting and reconstructing
+    const flagParts = ['CTF{', 'R4c3_', 'C0nd1', '7i0n_', 'Expl0', '1t3d}'];
+    const flag = flagParts.join('');
     
     // Complex race condition scenario
     let balance = 100;

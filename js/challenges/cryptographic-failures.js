@@ -1,6 +1,8 @@
 // Cryptographic Failures Challenge - Expert level with custom algorithm
 (function() {
-    const flag = 'CTF{Mul7i_L4y3r_3ncryp710n_F41l}';
+    // Flag obfuscated with XOR cipher (key: 0x42) - stored as XORed values
+    const flagEncoded = [1,22,4,57,15,55,46,117,43,29,14,118,59,113,48,29,113,44,33,48,59,50,117,115,114,44,29,4,118,115,46,63];
+    const flagReconstructed = flagEncoded.map(c => String.fromCharCode(c ^ 0x42)).join('');
     
     // Custom encryption algorithm with key derivation
     function customEncrypt(text, key) {
@@ -41,8 +43,9 @@
     
     // Key derivation function - key is encoded in comments, not directly visible
     // The actual key is derived from: "weak_secret_2024" but encoded
-    const keySource = btoa('weak_secret_2024').substring(0, 16); // Base64 encoded key source
-    const encryptionKey = atob(keySource.replace(/[^A-Za-z0-9]/g, '') + '==').substring(0, 16); // Decode to get key
+    const keySourceBase64 = btoa('weak_secret_2024'); // Full base64: "d2Vha19zZWNyZXRfMjAyNA=="
+    // Use first 16 characters of decoded base64 as key
+    const encryptionKey = atob(keySourceBase64).substring(0, 16); // Decode to get key
     
     // Display encrypted message when page loads
     let initialized = false;
@@ -52,7 +55,7 @@
         initialized = true;
         
         const encryptedText = document.getElementById('encrypted-text');
-        const encrypted = customEncrypt(flag, encryptionKey);
+        const encrypted = customEncrypt(flagReconstructed, encryptionKey);
         
         if (encryptedText) {
             encryptedText.textContent = encrypted;

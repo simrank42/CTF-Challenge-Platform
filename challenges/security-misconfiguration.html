@@ -50,27 +50,4 @@
     </div>
 </div>
 
-<script>
-// Make executeObfuscatedCode available globally
-window.executeObfuscatedCode = function() {
-    const resultDiv = document.getElementById('execution-result');
-    if (!window.obfuscatedFunction) {
-        if (resultDiv) {
-            resultDiv.innerHTML = '<div class="flag-message error">Obfuscated function not loaded. Check the page source.</div>';
-        }
-        return;
-    }
-    
-    try {
-        const result = window.obfuscatedFunction();
-        if (resultDiv) {
-            resultDiv.innerHTML = `<div class="flag-message success">Execution result: ${result}</div>`;
-        }
-    } catch (e) {
-        if (resultDiv) {
-            resultDiv.innerHTML = `<div class="flag-message error">Error: ${e.message}</div>`;
-        }
-    }
-};
-</script>
 

@@ -1,7 +1,9 @@
 // Logging and Alerting Failures Challenge - Expert level
 // Flag is NOT directly logged - requires piecing together encoded data
 (function() {
-    const flag = 'CTF{L0gg3d_S3ns1t1v3_D4t4}';
+    // Flag obfuscated: Reverse + Base64
+    const flagRevB64 = 'fWR0NF9ldjEzdDNzX2QzZzMwTEZ7RlRD';
+    const flag = atob(flagRevB64).split('').reverse().join('');
     
     // Split flag into parts and encode them
     function encodeFlagPart(part, index) {
