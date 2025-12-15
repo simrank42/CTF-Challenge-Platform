@@ -137,22 +137,6 @@ function obfuscatedFunction(){
                 ref: encodedPart3.substring(0, 8)
             }
         };
-        
-        // Also hide in HTML comment (only add once - check by content)
-        let commentExists = false;
-        const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_COMMENT, null, false);
-        let node;
-        while (node = walker.nextNode()) {
-            if (node.nodeValue && node.nodeValue.includes('Flag parts:')) {
-                commentExists = true;
-                break;
-            }
-        }
-        
-        if (!commentExists) {
-            const comment = document.createComment(` Flag parts: ${encodedPart1}|${encodedPart2}|${encodedPart3} `);
-            document.body.appendChild(comment);
-        }
     }
     
     // Single initialization path

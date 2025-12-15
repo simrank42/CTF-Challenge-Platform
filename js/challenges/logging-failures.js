@@ -17,13 +17,12 @@
         }
     }
     
-    // Split flag into 5 parts
+    // Split flag into parts
     const flagParts = [
-        flag.substring(0, 8),   // CTF{L0g
-        flag.substring(8, 16),  // g3d_S3n
-        flag.substring(16, 24), // s1t1v3_
-        flag.substring(24, 32), // D4t4}
-        flag.substring(4, 7)    // Red herring: L0g
+        flag.substring(0, 8),   // CTF{FL03
+        flag.substring(8, 16),   // g3d_s3t3
+        flag.substring(16, 24),  // 1ve_4td}
+        flag.substring(24, 32)   // (empty - flag is 24 chars)
     ];
     
     // Encode each part
@@ -39,48 +38,39 @@
         try {
             const error = new Error('Authentication failed');
             
-            // Log encoded flag part 1 in error context (but disguised)
+            // Reveal part 1 in error log
             const errorContext = {
-                requestId: 'req_' + encodedParts[0],
+                requestId: 'req_' + Date.now(),
                 sessionData: { token: userToken },
-                timestamp: new Date().toISOString()
+                timestamp: new Date().toISOString(),
+                flagPart1: encodedParts[0] // Part 1 revealed here
             };
             
             console.error('Error occurred:', error);
             console.error('Error context:', errorContext);
-            console.error('Request ID:', errorContext.requestId);
-            
-            // Log encoded flag part 2 in stack trace analysis
-            console.error('Stack analysis:', {
-                depth: 3,
-                hash: encodedParts[1],
-                location: 'auth.js:42'
-            });
+            console.error('Flag part 1 (encoded):', encodedParts[0]);
             
             throw error;
         } catch (e) {
-            // Log encoded flag part 3 in error handler metadata
             const errorMeta = {
                 code: 'AUTH_ERR',
-                ref: encodedParts[2],
                 severity: 'high'
             };
             console.log('Error metadata:', errorMeta);
-            console.log('Error reference:', errorMeta.ref);
         }
     };
     
     window.makeRequest = function() {
         const requestId = 'req_' + Date.now();
         
-        // Log encoded flag part 4 in request headers (disguised)
+        // Reveal part 2 in request
         const requestData = {
             endpoint: '/api/data',
             headers: {
                 'Authorization': 'Bearer ' + userToken,
                 'API-Key': apiKey,
                 'X-Request-Id': requestId,
-                'X-Correlation-Id': encodedParts[3] // Flag part hidden here
+                'X-Correlation-Id': encodedParts[1] // Part 2 revealed here
             },
             body: {
                 action: 'fetch',
@@ -90,58 +80,47 @@
         
         console.log('Making API request:', requestData);
         console.log('Request headers:', JSON.stringify(requestData.headers, null, 2));
+        console.log('Flag part 2 (encoded):', encodedParts[1]);
         
         const outputDiv = document.getElementById('app-output');
         if (outputDiv) {
             outputDiv.innerHTML = '<div class="flag-message success">Request sent! Analyze all logged data carefully.</div>';
         }
         
-        // Response contains encoded flag part 0 (first part) in correlation header
         setTimeout(function() {
             const response = {
                 status: 200,
                 headers: {
-                    'X-Correlation-Id': encodedParts[0], // First flag part
+                    'X-Correlation-Id': requestId,
                     'X-Request-Id': requestId
                 },
                 data: {
                     message: 'Success',
                     userData: {
-                        token: userToken,
-                        hash: encodedParts[1] // Second flag part
+                        token: userToken
                     }
                 }
             };
             console.log('Response received:', response);
-            console.log('Response headers:', JSON.stringify(response.headers, null, 2));
         }, 500);
     };
     
     window.debugMode = function() {
-        // Debug mode logs encoded data but not the flag directly
+        // Reveal part 3 in debug mode
         const debugInfo = {
             environment: 'production',
             debug: true,
             version: '1.0.0',
             config: {
                 apiKey: apiKey,
-                dbConnection: dbConnection,
-                // Flag parts encoded and scattered
-                checksum: encodedParts[0] + encodedParts[1],
-                signature: encodedParts[2] + encodedParts[3]
+                dbConnection: dbConnection
             },
-            metrics: {
-                requestHash: encodedParts[1],
-                sessionHash: encodedParts[0],
-                errorRef: encodedParts[2]
-            }
+            flagPart3: encodedParts[2] // Part 3 revealed here
         };
         
         console.log('=== DEBUG MODE ENABLED ===');
         console.log('Debug information:', debugInfo);
-        console.log('Configuration checksum:', debugInfo.config.checksum);
-        console.log('Configuration signature:', debugInfo.config.signature);
-        console.log('Metrics:', JSON.stringify(debugInfo.metrics, null, 2));
+        console.debug('Flag part 3 (encoded):', encodedParts[2]);
         console.log('========================');
         
         const outputDiv = document.getElementById('app-output');
@@ -150,47 +129,12 @@
         }
     };
     
-    // Log on page load - contains encoded flag parts disguised as normal data
+    // Initialize challenge - no logging on page load
     let initialized = false;
     function initChallenge() {
         // Prevent double initialization
         if (initialized) return;
         initialized = true;
-        
-        console.log('Application initialized');
-        console.log('Loading user session...');
-        
-        // Encoded flag parts logged as various identifiers
-        const sessionData = {
-            token: userToken,
-            apiKey: apiKey,
-            sessionId: 'sess_' + encodedParts[0], // First part
-            userId: 'user_' + encodedParts[1],     // Second part
-            requestHash: encodedParts[2],          // Third part
-            correlationId: encodedParts[3]         // Fourth part
-        };
-        
-        console.log('Session data:', sessionData);
-        console.log('Session ID:', sessionData.sessionId);
-        console.log('User ID:', sessionData.userId);
-        console.log('Request hash:', sessionData.requestHash);
-        console.log('Correlation ID:', sessionData.correlationId);
-        
-        // Also log in error handlers during initialization
-        try {
-            const initData = { 
-                status: 'ready',
-                version: '1.0.0',
-                buildId: encodedParts[0] + '_' + encodedParts[1]
-            };
-            console.log('Init complete:', initData);
-        } catch (e) {
-            console.error('Init error:', e);
-            console.error('Error context:', { 
-                ref: encodedParts[2],
-                hash: encodedParts[3]
-            });
-        }
     }
     
     // Single initialization path

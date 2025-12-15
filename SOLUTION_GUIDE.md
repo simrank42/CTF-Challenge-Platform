@@ -1,6 +1,6 @@
 # CTF Challenge Solution Guide
 
-This document provides step-by-step solutions for all challenges in the CTF platform.
+This document provides simple, tool-based solutions for all challenges.
 
 ## Flag Format
 All flags follow the format: `CTF{...}`
@@ -14,63 +14,32 @@ All flags follow the format: `CTF{...}`
 CTF{Mul7i_L4y3r_3ncryp710n_F41l}
 ```
 
-### Solution Steps
+### Simple Solution
 
-1. **Examine the Encrypted Message**
-   - The encrypted text is displayed in the challenge page
-   - Note that it appears to be base64 encoded (typical base64 characters)
+1. **Find the Key**
+   - Open DevTools (F12) → Elements tab
+   - View page source or inspect `<head>` section
+   - Find HTML comment: `Key source base64: d2Vha19zZWNyZXRfMjAyNA==`
+   - **Tool**: Use [base64decode.org](https://www.base64decode.org/) or browser console: `atob('d2Vha19zZWNyZXRfMjAyNA==')`
+   - Result: `weak_secret_2024` (use first 16 chars as key)
 
-2. **Find the Key**
-   - Open browser DevTools (F12)
-   - Go to the Elements/Inspector tab
-   - Look for HTML comments in the `<head>` section
-   - Find the comment containing: `Key source base64: d2Vha19zZWNyZXRfMjAyNA==`
-   - Decode this base64: `atob('d2Vha19zZWNyZXRfMjAyNA==')` = `weak_secret_2024`
-   - The encryption key is the first 16 characters: `weak_secret_2024`
+2. **Decrypt the Message**
+   - Copy the encrypted text from the page
+   - **Tool**: Use [CyberChef](https://gchq.github.io/CyberChef/) with this recipe:
+     - From Base64 (twice)
+     - Remove padding (first 8 and last 8 chars)
+     - From Hex
+     - Reverse string
+     - ROT13 (or Caesar -17 for letters, -5 for numbers)
+     - XOR with key `weak_secret_2024`
 
-3. **Understand the Encryption Algorithm**
-   - The code shows a custom encryption with multiple layers:
-     - Layer 1: XOR with key (cyclic)
-     - Layer 2: Custom substitution cipher (Caesar +17 for letters, +5 for numbers)
-     - Layer 3: String reversal
-     - Layer 4: Hex encoding
-     - Layer 5: Base64 encoding
-     - Layer 6: Add noise padding
-     - Layer 7: Final Base64 encoding (double encoding)
-
-4. **Decryption Process** (Reverse the encryption steps)
+3. **Quick Browser Method**
    ```javascript
-   // Step 1: Base64 decode twice
-   let decoded = atob(atob(encryptedString).substring(8, encryptedString.length - 8));
-   
-   // Step 2: Hex decode
-   decoded = decoded.match(/.{2}/g).map(h => String.fromCharCode(parseInt(h, 16))).join('');
-   
-   // Step 3: Reverse the string
-   decoded = decoded.split('').reverse().join('');
-   
-   // Step 4: Reverse substitution (Caesar -17 for letters, -5 for numbers)
-   decoded = decoded.split('').map(char => {
-       if (char >= 'A' && char <= 'Z') {
-           return String.fromCharCode(((char.charCodeAt(0) - 65 - 17 + 26) % 26) + 65);
-       } else if (char >= 'a' && char <= 'z') {
-           return String.fromCharCode(((char.charCodeAt(0) - 97 - 17 + 26) % 26) + 97);
-       } else if (char >= '0' && char <= '9') {
-           return String.fromCharCode(((char.charCodeAt(0) - 48 - 5 + 10) % 10) + 48);
-       }
-       return char;
-   }).join('');
-   
-   // Step 5: Reverse XOR with key
+   // In console, after finding key:
    const key = 'weak_secret_2024';
-   const flag = decoded.split('').map((char, idx) => {
-       const keyChar = key.charCodeAt(idx % key.length);
-       return String.fromCharCode(char.charCodeAt(0) ^ keyChar);
-   }).join('');
+   const encrypted = 'PASTE_ENCRYPTED_TEXT_HERE';
+   // Then reverse all encryption steps (see code for exact algorithm)
    ```
-
-5. **Submit the Flag**
-   - Use the decrypted flag: `CTF{Mul7i_L4y3r_3ncryp710n_F41l}`
 
 ---
 
@@ -81,55 +50,27 @@ CTF{Mul7i_L4y3r_3ncryp710n_F41l}
 CTF{0bfusc4t3d_S3cr3ts_Exp05ed}
 ```
 
-### Solution Steps
+### Simple Solution
 
-1. **Examine the Obfuscated Code**
-   - The challenge displays obfuscated JavaScript code
-   - It uses string arrays (`_0x1a2b`, `_0x3c4d`) and computed property names
+1. **Execute the Obfuscated Code**
+   - Click "Execute Code" button OR
+   - Open console and run: `obfuscatedFunction()`
 
-2. **Execute the Obfuscated Code**
-   - Click the "Execute Code" button
-   - Or open browser console and run: `obfuscatedFunction()`
-   - The function will log a config object
+2. **Find Flag Parts in Console**
+   - Look for the logged `config` object
+   - Find properties: `flagpart1`, `secretpart2`, `exposedpart3`
 
-3. **Analyze the Config Object**
-   - Open browser DevTools Console
-   - Look for the logged config object
-   - The config contains properties with computed names:
-     - `flagpart1`: First encoded part of the flag
-     - `secretpart2`: Second encoded part
-     - `exposedpart3`: Third encoded part
-   - Also check `checksum` and `signature` which contain combinations
+3. **Decode Each Part**
+   - **Part 1**: Reverse string, then Base64 decode
+     - **Tool**: [CyberChef](https://gchq.github.io/CyberChef/) → Reverse → From Base64
+   - **Part 2**: Hex to ASCII
+     - **Tool**: [rapidtables.com/convert/number/hex-to-ascii.html](https://www.rapidtables.com/convert/number/hex-to-ascii.html)
+   - **Part 3**: Split by `|`, Base64 decode each, XOR with 0x55
+     - **Tool**: CyberChef → Split by `|` → From Base64 → XOR (key: 0x55)
 
-4. **Decode Each Part**
-   
-   **Part 1 (flagpart1):**
-   - It's base64 encoded, then reversed
-   - Reverse the string first, then base64 decode
-   ```javascript
-   const part1 = atob(encodedPart1.split('').reverse().join(''));
-   ```
-
-   **Part 2 (secretpart2):**
-   - It's hex encoded
-   ```javascript
-   const part2 = encodedPart2.match(/.{2}/g).map(h => String.fromCharCode(parseInt(h, 16))).join('');
-   ```
-
-   **Part 3 (exposedpart3):**
-   - It's XORed with 0x55, then base64 encoded with '|' separators
-   ```javascript
-   const part3Base64 = encodedPart3.split('|').map(s => String.fromCharCode(atob(s).charCodeAt(0) ^ 0x55)).join('');
-   ```
-
-5. **Reconstruct the Flag**
-   - Combine all three parts: `part1 + part2 + part3`
-   - Result: `CTF{0bfusc4t3d_S3cr3ts_Exp05ed}`
-
-6. **Alternative: Check HTML Comments**
-   - Inspect page source or use DevTools
-   - Look for HTML comments containing flag parts
-   - Format: `Flag parts: [part1]|[part2]|[part3]`
+4. **Alternative: Check HTML Comments**
+   - View page source
+   - Search for comment: `Flag parts: [part1]|[part2]|[part3]`
 
 ---
 
@@ -140,65 +81,34 @@ CTF{0bfusc4t3d_S3cr3ts_Exp05ed}
 CTF{H1dd3n_1n_Pl41n_S1ght}
 ```
 
-### Solution Steps
+### Simple Solution
 
-1. **Examine the Image**
-   - The challenge displays an image generated dynamically
-   - The flag is hidden using LSB (Least Significant Bit) steganography
+1. **Use Browser Console**
+   - Open DevTools Console (F12)
+   - Run: `extractStegoFlag()`
+   - Flag will be logged to console
 
-2. **Understand LSB Steganography**
-   - Each pixel has RGB values (Red, Green, Blue)
-   - Each color channel is 8 bits (0-255)
-   - The least significant bit (LSB) of each channel can store data
-   - The flag is encoded in binary and stored in LSBs sequentially
-
-3. **Extract the Flag from Image**
-   
-   **Method 1: Using Browser Console**
+2. **Manual Extraction (if function not available)**
    ```javascript
-   // The image is in the DOM
    const img = document.getElementById('stego-image');
    const canvas = document.createElement('canvas');
    const ctx = canvas.getContext('2d');
    canvas.width = img.width;
    canvas.height = img.height;
    ctx.drawImage(img, 0, 0);
-   const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-   const data = imageData.data;
+   const data = ctx.getImageData(0, 0, canvas.width, canvas.height).data;
    
-   let binaryString = '';
-   // Extract LSBs from RGB channels sequentially
+   let binary = '';
    for (let i = 0; i < data.length; i += 4) {
-       binaryString += (data[i] & 1).toString();     // Red channel LSB
-       binaryString += (data[i + 1] & 1).toString(); // Green channel LSB
-       binaryString += (data[i + 2] & 1).toString(); // Blue channel LSB
-       
-       // Check for end marker (8 consecutive zeros)
-       if (binaryString.length >= 8) {
-           const last8 = binaryString.substring(binaryString.length - 8);
-           if (last8 === '00000000') {
-               break;
-           }
-       }
+       binary += (data[i] & 1) + (data[i+1] & 1) + (data[i+2] & 1);
    }
-   
-   // Convert binary to text
-   let flag = '';
-   for (let i = 0; i < binaryString.length - 8; i += 8) {
-       const byte = binaryString.substring(i, i + 8);
-       const charCode = parseInt(byte, 2);
-       if (charCode === 0) break;
-       flag += String.fromCharCode(charCode);
-   }
-   console.log(flag);
+   // Convert binary to text (8 bits per char, stop at 00000000)
    ```
 
-   **Method 2: Use Provided Function**
-   - Check if `extractStegoFlag()` is available in console
-   - Run: `extractStegoFlag()`
-
-4. **Submit the Flag**
-   - Use the extracted flag: `CTF{H1dd3n_1n_Pl41n_S1ght}`
+3. **Tool Alternative**
+   - Download the image
+   - Use [StegOnline](https://stegonline.georgeom.net/) or similar LSB steganography tool
+   - Extract LSB from RGB channels
 
 ---
 
@@ -209,50 +119,27 @@ CTF{H1dd3n_1n_Pl41n_S1ght}
 CTF{R4c3_C0nd17i0n_Expl01t3d}
 ```
 
-### Solution Steps
+### Simple Solution
 
-1. **Understand the Vulnerability**
-   - The payment system has a race condition
-   - Balance check and deduction are separate asynchronous operations
+1. **Exploit the Race Condition**
+   - **Method 1**: Rapidly click "Purchase Item" button 10-15 times quickly
+   - **Method 2**: Open console and run:
+     ```javascript
+     exploitRaceCondition();
+     ```
+   - **Method 3**: Run:
+     ```javascript
+     for(let i=0; i<20; i++) makePurchase();
+     ```
+
+2. **Check for Flag**
+   - Click "Check Status" button
+   - Flag appears when balance goes negative or multiple transactions process
+
+3. **Why It Works**
+   - Balance check (30-70ms delay) and deduction (80-160ms delay) are separate
    - Multiple checks can pass before any deduction occurs
-
-2. **Analyze the Code Flow**
-   - `makePurchase()` checks balance asynchronously (50-100ms delay)
-   - Balance deduction happens after check (100-200ms delay)
-   - This creates a vulnerability window
-
-3. **Exploit the Race Condition**
-   
-   **Method 1: Rapid Button Clicks**
-   - Rapidly click the "Purchase Item" button multiple times (10-15 clicks)
-   - Multiple checks will pass before any deduction
-   - Balance will go negative, triggering flag reveal
-
-   **Method 2: Console Exploit Function**
-   ```javascript
-   // Use the provided helper function
-   exploitRaceCondition();
-   
-   // Or manually trigger multiple purchases
-   for (let i = 0; i < 15; i++) {
-       makePurchase();
-   }
-   ```
-
-   **Method 3: Advanced Exploit**
-   ```javascript
-   advancedExploit(); // Triggers 15 purchases
-   ```
-
-4. **Check for Flag**
-   - After exploitation, click "Check Status" button
-   - Or wait for automatic flag reveal
-   - The flag appears when:
-     - Balance goes negative (`balance < 0`), OR
-     - Multiple transactions are pending (`pendingTransactions.length > 1`)
-
-5. **Submit the Flag**
-   - Use the revealed flag: `CTF{R4c3_C0nd17i0n_Expl01t3d}`
+   - This creates a race condition window
 
 ---
 
@@ -263,115 +150,28 @@ CTF{R4c3_C0nd17i0n_Expl01t3d}
 CTF{FL03g3d_s3t31ve_4td}
 ```
 
-### Solution Steps
+### Simple Solution
 
-1. **Open Browser DevTools**
-   - Press F12 to open Developer Tools
-   - Go to the Console tab
-   - Keep Network tab open as well (optional)
+1. **Open Console and Trigger Actions**
+   - Press F12 → Console tab
+   - Click all buttons: "Trigger Error", "Make Request", "Debug Mode"
+   - Check initial page load logs
 
-2. **Trigger All Actions**
-   - Click "Trigger Error" button
-   - Click "Make Request" button
-   - Click "Debug Mode" button
-   - Also check initial page load logs
+2. **Find Encoded Flag Parts**
+   Look for these in console logs:
+   - **Part 0** (Base64): `Session ID: sess_[encoded]` or `X-Correlation-Id` in response headers
+   - **Part 1** (Hex): `User ID: user_[encoded]` or `response.data.userData.hash`
+   - **Part 2** (XOR+Hex): `Request hash: [encoded]` or `Error metadata ref: [encoded]`
 
-3. **Collect Encoded Flag Parts**
-   
-   The flag `CTF{FL03g3d_s3t31ve_4td}` is split into 3 parts (actually 4 array elements but part 3 is empty):
-   - Part 0: `CTF{FL03` (first 8 characters)
-   - Part 1: `g3d_s3t3` (characters 8-16)
-   - Part 2: `1ve_4td}` (characters 16-24)
-   - Part 3: Empty string (but still encoded and logged)
+3. **Decode Using Tools**
+   - **Part 0**: [base64decode.org](https://www.base64decode.org/)
+   - **Part 1**: [rapidtables.com/convert/number/hex-to-ascii.html](https://www.rapidtables.com/convert/number/hex-to-ascii.html)
+   - **Part 2**: Hex decode first, then XOR with 0x42
+     - **Tool**: CyberChef → From Hex → XOR (key: 0x42)
 
-   Each part is encoded differently and scattered across logs:
-
-   **Part 0: Base64 Encoded (no padding)**
-   - Found in: 
-     - Session ID: `sessionData.sessionId` (remove 'sess_' prefix)
-     - Response headers `X-Correlation-Id`
-     - Build ID: `initData.buildId` (first part before '_')
-   - Decode: `atob(encodedString)`
-   - Example: Base64 of "CTF{FL03" = "Q1RGe0ZMMDM=" (without padding: "Q1RGe0ZMMDM")
-
-   **Part 1: Hex Encoded**
-   - Found in:
-     - User ID: `sessionData.userId` (remove 'user_' prefix)
-     - Response data hash: `response.data.userData.hash`
-     - Error stack analysis hash
-   - Decode: 
-   ```javascript
-   const part1 = hexString.match(/.{2}/g).map(h => String.fromCharCode(parseInt(h, 16))).join('');
-   ```
-   - Example: Hex of "g3d_s3t3" = "6733645f73337433"
-
-   **Part 2: XOR + Hex Encoded**
-   - XOR key: 0x42
-   - Found in:
-     - Request hash: `sessionData.requestHash`
-     - Error metadata ref: `errorMeta.ref`
-   - Decode:
-   ```javascript
-   const part2 = hexString.match(/.{2}/g).map(h => String.fromCharCode(parseInt(h, 16) ^ 0x42)).join('');
-   ```
-   - Example: "1ve_4td}" XOR 0x42 then hex encoded
-
-   **Part 3: Custom Encoding (base36)**
-   - Found in:
-     - Correlation ID: `sessionData.correlationId`
-     - Request headers `X-Correlation-Id`
-   - This uses custom encoding: (charCode + 13).toString(36)
-   - Since part 3 is empty string, this will be empty too
-
-4. **Locate Specific Log Entries**
-   
-   After triggering all actions, search console logs for:
-   - Session initialization logs (page load)
-   - Error logs (from Trigger Error)
-   - Request/Response logs (from Make Request)
-   - Debug mode logs (from Debug Mode)
-
-   Key locations (from code analysis):
-   - `Session ID: sess_[encoded]` → Part 0 (Base64, remove 'sess_' prefix)
-   - `User ID: user_[encoded]` → Part 1 (Hex, remove 'user_' prefix)
-   - `Request hash: [encoded]` → Part 2 (XOR+Hex)
-   - `Error context requestId: req_[encoded]` → Part 0 (Base64, remove 'req_' prefix)
-   - `Stack analysis hash: [encoded]` → Part 1 (Hex)
-   - `Error metadata ref: [encoded]` → Part 2 (XOR+Hex)
-   - Request headers `X-Correlation-Id` → Part 3 (base36, empty string)
-   - Response headers `X-Correlation-Id` → Part 0 (Base64)
-   - Response data hash: `response.data.userData.hash` → Part 1 (Hex)
-   - Build ID: `initData.buildId` → Part 0 + '_' + Part 1 (split on '_')
-
-5. **Decode and Combine**
-   
-   Once you have all 3 encoded parts (from session initialization or triggered actions):
-   ```javascript
-   // Part 0: Base64 decode
-   const part0 = atob(encodedPart0); // "CTF{FL03"
-   
-   // Part 1: Hex decode
-   const part1 = encodedPart1.match(/.{2}/g).map(h => String.fromCharCode(parseInt(h, 16))).join(''); // "g3d_s3t3"
-   
-   // Part 2: Hex decode then XOR (key 0x42)
-   const part2 = encodedPart2.match(/.{2}/g).map(h => String.fromCharCode(parseInt(h, 16) ^ 0x42)).join(''); // "1ve_4td}"
-   
-   // Combine all parts
-   const flag = part0 + part1 + part2; // "CTF{FL03g3d_s3t31ve_4td}"
-   ```
-   
-   **Note:** Part 3 is empty in the actual flag, so you only need parts 0, 1, and 2.
-
-6. **Alternative: Analyze Encoded Strings Directly**
-   - Look for patterns in logs
-   - The flag parts appear as:
-     - Session identifiers
-     - Request/Correlation IDs
-     - Error references
-     - Hash values
-
-7. **Submit the Flag**
-   - Use the reconstructed flag: `CTF{FL03g3d_s3t31ve_4td}`
+4. **Combine Parts**
+   - Simply concatenate: `part0 + part1 + part2`
+   - Result: `CTF{FL03g3d_s3t31ve_4td}`
 
 ---
 
@@ -387,33 +187,26 @@ Challenge 5 (Logging Failures):          CTF{FL03g3d_s3t31ve_4td}
 
 ---
 
-## Tools and Techniques Used
+## Recommended Tools
 
-### Browser DevTools
-- **Elements/Inspector**: View HTML source, comments, attributes
-- **Console**: Execute JavaScript, view logs, debug code
-- **Network**: Monitor requests/responses (less critical for these challenges)
-- **Sources**: View JavaScript source code
+### Online Tools (No Installation Required)
+- **[CyberChef](https://gchq.github.io/CyberChef/)** - Swiss Army knife for encoding/decoding
+- **[base64decode.org](https://www.base64decode.org/)** - Quick Base64 decode
+- **[rapidtables.com](https://www.rapidtables.com/convert/number/hex-to-ascii.html)** - Hex to ASCII converter
+- **[StegOnline](https://stegonline.georgeom.net/)** - LSB steganography extractor
 
-### Common Encoding/Decoding
-- **Base64**: `btoa()` encode, `atob()` decode
-- **Hex**: `parseInt(hex, 16)` to number, `number.toString(16)` to hex
-- **XOR**: `charCode ^ key`
-- **Binary**: `parseInt(binary, 2)` to number, `number.toString(2)` to binary
+### Browser Built-in Tools
+- **DevTools Console** - Run JavaScript, view logs
+- **Elements/Inspector** - View HTML source, comments
+- **Network Tab** - Monitor requests (optional)
 
-### Useful JavaScript Snippets
+### Quick JavaScript Snippets
 ```javascript
 // Base64 decode
 atob('encoded_string')
 
-// Hex to ASCII
+// Hex to text
 hexString.match(/.{2}/g).map(h => String.fromCharCode(parseInt(h, 16))).join('')
-
-// ASCII to Hex
-text.split('').map(c => c.charCodeAt(0).toString(16).padStart(2, '0')).join('')
-
-// Binary to ASCII
-binaryString.match(/.{8}/g).map(b => String.fromCharCode(parseInt(b, 2))).join('')
 
 // XOR cipher
 text.split('').map(c => String.fromCharCode(c.charCodeAt(0) ^ key)).join('')
@@ -421,11 +214,18 @@ text.split('').map(c => String.fromCharCode(c.charCodeAt(0) ^ key)).join('')
 
 ---
 
+## Presentation Tips
+
+1. **For Live Demos**: Use CyberChef for visual encoding/decoding steps
+2. **For Workshops**: Show browser DevTools as the primary tool
+3. **For Documentation**: Link to online tools rather than showing code
+4. **Quick Solutions**: Most challenges can be solved with 2-3 tool operations
+
+---
+
 ## Notes for CTF Organizers
 
-- This solution guide should be kept separate from the main repository
-- Consider password-protecting this file or storing it in a private location
-- Flags are obfuscated in the codebase but can be reconstructed using these methods
-- All challenges are designed to be solvable using only browser DevTools
-- No external tools are required, though they can make some steps easier
-
+- All challenges solvable with browser DevTools + online tools
+- No external software installation required
+- Solutions are designed to be teachable in 5-10 minutes each
+- Flags are intentionally obfuscated but recoverable with proper tools
