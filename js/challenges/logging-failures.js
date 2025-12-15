@@ -38,17 +38,22 @@
         try {
             const error = new Error('Authentication failed');
             
-            // Reveal part 1 in error log
             const errorContext = {
                 requestId: 'req_' + Date.now(),
                 sessionData: { token: userToken },
                 timestamp: new Date().toISOString(),
-                flagPart1: encodedParts[0] // Part 1 revealed here
+                correlationId: 'corr_' + encodedParts[0],
+                stackSig: 'sig_' + encodedParts[0].slice(0, 6)
             };
             
             console.error('Error occurred:', error);
             console.error('Error context:', errorContext);
-            console.error('Flag part 1 (encoded):', encodedParts[0]);
+            console.error('Stack analysis:', {
+                depth: 3,
+                hash: encodedParts[0], // encoded part hidden as hash
+                location: 'auth.js:42',
+                note: 'trace correlation only'
+            });
             
             throw error;
         } catch (e) {
@@ -63,24 +68,25 @@
     window.makeRequest = function() {
         const requestId = 'req_' + Date.now();
         
-        // Reveal part 2 in request
         const requestData = {
             endpoint: '/api/data',
             headers: {
                 'Authorization': 'Bearer ' + userToken,
                 'API-Key': apiKey,
                 'X-Request-Id': requestId,
-                'X-Correlation-Id': encodedParts[1] // Part 2 revealed here
+                // encodedParts[1] placed in correlation id, presented as a checksum
+                'X-Correlation-Id': encodedParts[1]
             },
             body: {
                 action: 'fetch',
-                timestamp: Date.now()
+                timestamp: Date.now(),
+                checksum: encodedParts[1].slice(0, 6) + '-chk'
             }
         };
         
         console.log('Making API request:', requestData);
         console.log('Request headers:', JSON.stringify(requestData.headers, null, 2));
-        console.log('Flag part 2 (encoded):', encodedParts[1]);
+        console.log('Request fingerprint:', requestData.body.checksum);
         
         const outputDiv = document.getElementById('app-output');
         if (outputDiv) {
@@ -97,7 +103,8 @@
                 data: {
                     message: 'Success',
                     userData: {
-                        token: userToken
+                        token: userToken,
+                        signature: 'sig-' + encodedParts[1].slice(-6)
                     }
                 }
             };
@@ -106,7 +113,6 @@
     };
     
     window.debugMode = function() {
-        // Reveal part 3 in debug mode
         const debugInfo = {
             environment: 'production',
             debug: true,
@@ -115,12 +121,16 @@
                 apiKey: apiKey,
                 dbConnection: dbConnection
             },
-            flagPart3: encodedParts[2] // Part 3 revealed here
+            metrics: {
+                latencyMs: Math.floor(Math.random() * 40) + 80,
+                featureToggle: encodedParts[2], // encoded part disguised as feature toggle key
+                checksum: 'chk-' + encodedParts[2].slice(0, 5)
+            }
         };
         
         console.log('=== DEBUG MODE ENABLED ===');
         console.log('Debug information:', debugInfo);
-        console.debug('Flag part 3 (encoded):', encodedParts[2]);
+        console.log('Feature flags:', debugInfo.metrics.featureToggle);
         console.log('========================');
         
         const outputDiv = document.getElementById('app-output');
