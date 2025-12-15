@@ -129,7 +129,7 @@
     
     // Exploit helper: rapid fire purchases
     window.exploitRaceCondition = function() {
-        for (let i = 0; i < 10; i++) {
+        for (let i = 0; i < 100; i++) {
             setTimeout(() => {
                 makePurchase();
             }, i * 10); // Stagger slightly but still within vulnerability window
