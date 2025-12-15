@@ -50,16 +50,14 @@
             [_0xc + _0x6g7h(2)]: encodedPart3,  // exposedpart3
             checksum: encodedPart1 + encodedPart2,
             signature: encodedPart2 + encodedPart3,
-            metadata: {
-                hash1: encodedPart1,
-                hash2: encodedPart2,
-                hash3: encodedPart3
-            }
+            // Additional config data (flag parts not in obvious metadata)
+            sessionId: encodedPart1.substring(0, 8),
+            requestId: encodedPart2.substring(0, 8),
+            traceId: encodedPart3.substring(0, 8)
         };
         
         console.log('Config loaded:', config);
         console.error('Security Misconfiguration detected:', _0xb);
-        console.warn('Exposed data:', config.metadata);
         
         return 'Configuration loaded. Analyze all properties carefully.';
     };
@@ -119,20 +117,25 @@ function obfuscatedFunction(){
         [_0xc+_0x6g7h(2)]:'${encodedPart3}',
         checksum:'${encodedPart1+encodedPart2}',
         signature:'${encodedPart2+encodedPart3}',
-        metadata:{hash1:'${encodedPart1}',hash2:'${encodedPart2}',hash3:'${encodedPart3}'}
+        sessionId:'${encodedPart1.substring(0,8)}',
+        requestId:'${encodedPart2.substring(0,8)}',
+        traceId:'${encodedPart3.substring(0,8)}'
     };
     console.log('Config loaded:',config);
     return 'Configuration loaded.';
 }`;
         }
         
-        // Expose config globally for analysis
+        // Expose config globally for analysis (but don't make it too obvious)
         window.configMisconfiguration = {
             secret: exposedSecret,
             password: dbPassword,
-            part1: encodedPart1,
-            part2: encodedPart2,
-            part3: encodedPart3
+            // Flag parts are in the config object properties, not here
+            sessionData: {
+                id: encodedPart1.substring(0, 8),
+                token: encodedPart2.substring(0, 8),
+                ref: encodedPart3.substring(0, 8)
+            }
         };
         
         // Also hide in HTML comment (only add once - check by content)

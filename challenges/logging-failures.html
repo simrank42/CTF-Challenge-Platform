@@ -1,33 +1,18 @@
 <div class="challenge-content">
     <h2>Logging and Alerting Failures Challenge</h2>
-    <p>Sensitive information has been exposed through improper logging and error handling. Extract the flag from logs and error messages.</p>
+    <p>Extract sensitive information from logs and error messages.</p>
     
     <div class="info-box">
-        <strong>Challenge:</strong> Sensitive information has been logged through improper error handling and debug statements. However, the flag is NOT directly logged - it has been encoded and split across multiple log entries. You must analyze all logs, decode the encoded pieces, and reconstruct the complete flag.
-    </div>
-    
-    <div class="warning-box">
-        <strong>Note:</strong> This challenge requires advanced log analysis and data reconstruction skills. The flag is encoded and scattered across different log sources - you'll need to identify the encoding schemes and piece them together.
+        <strong>Challenge:</strong> Sensitive information has been logged through improper error handling. The flag is encoded and split across multiple log entries. Analyze all logs to reconstruct it.
     </div>
     
     <h3>Application Interface</h3>
     <div class="info-box">
-        <p>Interact with the application below and analyze ALL logged data. The flag is encoded in different ways across multiple log entries. Pay attention to headers, IDs, hashes, and other seemingly random values.</p>
+        <p>Interact with the application and analyze all logged data carefully.</p>
         <button class="btn-submit" onclick="triggerError()">Trigger Error</button>
         <button class="btn-submit" onclick="makeRequest()" style="margin-left: 1rem;">Make Request</button>
         <button class="btn-submit" onclick="debugMode()" style="margin-left: 1rem;">Debug Mode</button>
         <div id="app-output" class="mt-2"></div>
-    </div>
-    
-    <div class="warning-box mt-2">
-        <strong>Important:</strong> Open your browser's Developer Tools (F12) and analyze:
-        <ul style="margin-top: 0.5rem; padding-left: 1.5rem;">
-            <li>All console messages (errors, logs, warnings)</li>
-            <li>Request/response headers and data</li>
-            <li>Error context and metadata</li>
-            <li>Session IDs, correlation IDs, hashes, checksums</li>
-            <li>Multiple encoding schemes are used (Base64, Hex, XOR, custom)</li>
-        </ul>
     </div>
     
     <div class="flag-submission">
@@ -46,7 +31,7 @@
                 Hint 1 <span id="hint-1-arrow">▼</span>
             </button>
             <div id="hint-1" class="hint-content hidden">
-                The flag is split into 4 parts and encoded differently. Part 1 is Base64 (no padding), Part 2 is Hex, Part 3 is XOR (0x42) then Hex, Part 4 is custom encoding. Look for encoded strings in: request/response headers (X-Correlation-Id, X-Request-Id), session IDs, error context, metadata hashes, checksums. Each part appears in different log entries.
+                Four encodings: Base64 (no padding), Hex, XOR+Hex, and custom encoding. Look in headers (X-Correlation-Id, X-Request-Id), session data, error context, and response data.
             </div>
         </div>
         <div class="hint-item">
@@ -54,10 +39,8 @@
                 Hint 2 <span id="hint-2-arrow">▼</span>
             </button>
             <div id="hint-2" class="hint-content hidden">
-                Trigger all three actions (error, request, debug) and analyze ALL logged data. Part 1: Response X-Correlation-Id or sessionId (Base64). Part 2: Error stack analysis hash or userId (Hex). Part 3: Error metadata ref (XOR+Hex). Part 4: Request X-Correlation-Id header (custom encoding). Decode each part and combine: Part1 + Part2 + Part3 + Part4 = flag.
+                Trigger all actions and collect encoded strings. Part 1: Base64 decode. Part 2: Hex decode. Part 3: Hex then XOR (0x42). Part 4: Custom encoding. Combine in order.
             </div>
         </div>
     </div>
 </div>
-
-

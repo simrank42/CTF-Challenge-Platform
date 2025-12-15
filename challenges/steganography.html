@@ -1,25 +1,14 @@
 <div class="challenge-content">
     <h2>Steganography Challenge</h2>
-    <p>Information has been hidden using steganography techniques. Can you extract the hidden flag?</p>
+    <p>Extract the hidden flag from the image.</p>
     
     <div class="info-box">
-        <strong>Challenge:</strong> The flag is split into 3 parts and hidden using multiple steganography techniques: zero-width Unicode characters (U+200B, U+200C, U+200D), CSS content properties, Unicode whitespace characters, and HTML comments with different encodings (Base64, Hex). You must extract all parts, decode them, and reconstruct the flag.
+        <strong>Challenge:</strong> The flag is hidden in the image using steganography. Analyze the image to extract the hidden data.
     </div>
     
-    <div class="warning-box">
-        <strong>Note:</strong> This challenge requires expertise in steganography and data extraction techniques.
-    </div>
-    
-    <h3>Image with Hidden Data</h3>
-    <div id="stego-container" class="info-box">
-        <p>Look carefully at this image and the page source...</p>
-        <!-- Flag hidden using zero-width characters -->
-        <div style="font-family: monospace; white-space: pre;" id="hidden-text"></div>
-    </div>
-    
-    <h3>CSS Steganography</h3>
-    <div class="warning-box">
-        <p>Sometimes data is hidden in CSS whitespace or other invisible characters. Inspect the CSS carefully.</p>
+    <h3>The Image</h3>
+    <div id="stego-image-container" class="info-box" style="text-align: center; padding: 2rem;">
+        <p style="margin-bottom: 1rem; color: var(--color-text-muted);">Loading image...</p>
     </div>
     
     <div class="flag-submission">
@@ -38,7 +27,7 @@
                 Hint 1 <span id="hint-1-arrow">▼</span>
             </button>
             <div id="hint-1" class="hint-content hidden">
-                The flag has 3 parts. Part 1 is in zero-width characters (U+200B=0, U+200C=1, U+200D=separator) in the visible text. Part 2 is in CSS ::before and ::after pseudo-elements. Part 3 is encoded in HTML comments (Base64 and Hex). Extract zero-width chars, convert binary to ASCII.
+                The least significant bit of each color channel holds a secret. Extract them in order.
             </div>
         </div>
         <div class="hint-item">
@@ -46,10 +35,8 @@
                 Hint 2 <span id="hint-2-arrow">▼</span>
             </button>
             <div id="hint-2" class="hint-content hidden">
-                Zero-width encoding: U+200B = binary 0, U+200C = binary 1, U+200D = byte separator. Extract the zero-width sequence, convert to binary, then to ASCII characters. Check CSS for parts 2 and 3 in ::before/::after content. HTML comments contain Base64 and Hex encoded parts.
+                LSB steganography: Read RGB channels sequentially, extract LSBs, convert binary to ASCII. Look for the end marker (8 zeros).
             </div>
         </div>
     </div>
 </div>
-
-

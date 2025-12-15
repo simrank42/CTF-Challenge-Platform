@@ -1,13 +1,9 @@
 <div class="challenge-content">
     <h2>Cryptographic Failures Challenge</h2>
-    <p>You've intercepted an encrypted message. The encryption system uses multiple layers of encoding with a weak key derivation mechanism. Can you decrypt it?</p>
+    <p>Decrypt the encrypted message to find the flag.</p>
     
     <div class="info-box">
-        <strong>Challenge:</strong> The flag has been encrypted using a custom multi-layer encryption algorithm with key derivation. The encryption involves XOR, custom substitution, reversal, hex encoding, and double Base64 encoding. The key is encoded and hidden - you must reverse engineer the encryption process to decrypt the flag.
-    </div>
-    
-    <div class="warning-box">
-        <strong>Note:</strong> This challenge requires advanced cryptographic knowledge and analysis skills.
+        <strong>Challenge:</strong> The flag has been encrypted using multiple encoding layers. Decrypt it by reversing the encryption process.
     </div>
     
     <h3>Encrypted Message</h3>
@@ -15,7 +11,7 @@
         <code id="encrypted-text"></code>
     </div>
     
-    <h3>Key Derivation Function (Weak Implementation)</h3>
+    <h3>Key Derivation Function</h3>
     <pre id="key-derivation-code"></pre>
     
     <div class="flag-submission">
@@ -47,5 +43,3 @@
         </div>
     </div>
 </div>
-
-

@@ -1,13 +1,9 @@
 <div class="challenge-content">
     <h2>Security Misconfiguration Challenge</h2>
-    <p>A critical security configuration has been exposed through obfuscated JavaScript code. Deobfuscate the code to reveal the hidden secrets.</p>
+    <p>Deobfuscate the JavaScript code to reveal hidden secrets.</p>
     
     <div class="info-box">
-        <strong>Challenge:</strong> The JavaScript code is heavily obfuscated using string array lookups and computed property names. The flag has been split into 3 parts, each encoded differently (Base64 reversed, Hex, XOR+Base64). You must deobfuscate the code, execute it, analyze the configuration object, decode each part, and reconstruct the complete flag.
-    </div>
-    
-    <div class="warning-box">
-        <strong>Note:</strong> This challenge requires deep understanding of JavaScript execution and code analysis techniques.
+        <strong>Challenge:</strong> The JavaScript code is obfuscated and contains exposed secrets. Analyze and execute the code to find the flag.
     </div>
     
     <h3>Obfuscated Code</h3>
@@ -15,7 +11,7 @@
     
     <h3>Code Execution</h3>
     <div class="info-box">
-        <p>Try executing the code in the browser console to see what it does. Look for exposed API keys, secrets, or misconfigurations.</p>
+        <p>Execute the obfuscated code to see what it reveals.</p>
         <button class="btn-submit" onclick="executeObfuscatedCode()">Execute Code</button>
         <div id="execution-result" class="mt-2"></div>
     </div>
@@ -36,7 +32,7 @@
                 Hint 1 <span id="hint-1-arrow">▼</span>
             </button>
             <div id="hint-1" class="hint-content hidden">
-                The obfuscation uses string arrays (_0x1a2b, _0x3c4d) and computed property names. Execute the code to see the actual config object. The flag parts are stored in properties like flagpart1, secretpart2, exposedpart3, and also in metadata hashes.
+                Execute the code, examine the config object. Properties are computed dynamically - look for flagpart1, secretpart2, exposedpart3.
             </div>
         </div>
         <div class="hint-item">
@@ -44,10 +40,8 @@
                 Hint 2 <span id="hint-2-arrow">▼</span>
             </button>
             <div id="hint-2" class="hint-content hidden">
-                After executing, check the config object's properties. Part 1 is Base64 encoded then reversed. Part 2 is hex encoded. Part 3 is XORed (0x55) then Base64 encoded with '|' separators. Decode each part and combine them in order.
+                Three encodings: Part 1 is base64 reversed, Part 2 is hex, Part 3 is XOR then base64 with separators. Decode and combine.
             </div>
         </div>
     </div>
 </div>
-
-
