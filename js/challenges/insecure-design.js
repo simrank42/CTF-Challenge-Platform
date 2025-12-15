@@ -15,42 +15,79 @@
     window.makePurchase = function() {
         transactionCount++;
         const txId = 'tx_' + transactionCount + '_' + Date.now();
+        const capturedBalance = balance; // Capture balance at start (race condition: multiple see same value)
         
-        // Step 1: Check balance (async with delay - vulnerability window)
-        const checkPromise = new Promise((resolve) => {
-            setTimeout(() => {
-                resolve(balance >= itemCost);
-            }, 50 + Math.random() * 50); // Random delay increases race condition probability
+        // Step 1: Add to pending immediately (before check completes)
+        // This is the vulnerability - multiple can be added before checks complete
+        pendingTransactions.push({
+            txId: txId,
+            amount: itemCost,
+            timestamp: Date.now(),
+            checked: false
         });
         
-        // Step 2: If check passes, add to pending (vulnerability: check happens before deduction)
-        checkPromise.then((canPurchase) => {
-            if (canPurchase) {
-                pendingTransactions.push({
-                    txId: txId,
-                    amount: itemCost,
-                    timestamp: Date.now()
-                });
+        // Step 2: Check balance (async with delay - creates vulnerability window)
+        const checkPromise = new Promise((resolve) => {
+            setTimeout(() => {
+                // RACE CONDITION: Multiple checks can happen simultaneously before any deduction
+                // All see the same balance value, so if sent rapidly, multiple can pass
+                const balanceAtCheck = balance; // Use current balance (shared state)
                 
-                // Step 3: Actually deduct balance (delayed)
+                // Count OTHER pending transactions (excluding this one)
+                const otherPending = pendingTransactions.filter(tx => tx.txId !== txId && !tx.checked);
+                
+                // Vulnerability: Allow transaction if balance is sufficient OR if other transactions are pending
+                // This creates the race condition - if other transactions are already pending, this one can also pass
+                if (balanceAtCheck >= itemCost || otherPending.length > 0) {
+                    resolve(true);
+                } else {
+                    resolve(false);
+                }
+            }, 30 + Math.random() * 40); // Random delay 30-70ms creates vulnerability window
+        });
+        
+        // Step 3: After check completes, process transaction
+        checkPromise.then((canPurchase) => {
+            const txIndex = pendingTransactions.findIndex(tx => tx.txId === txId);
+            if (txIndex === -1) return;
+            
+            if (canPurchase) {
+                // Mark as valid and proceed with deduction
+                pendingTransactions[txIndex].checked = true;
+                
+                // Step 4: Deduct balance (delayed - creates longer vulnerability window)
                 setTimeout(() => {
                     balance -= itemCost;
                     updateBalance();
                     
-                    // Check if exploitation succeeded (balance went negative or multiple transactions)
-                    if (balance < 0 || pendingTransactions.length > 1) {
+                    // Remove from pending
+                    const removeIndex = pendingTransactions.findIndex(tx => tx.txId === txId);
+                    if (removeIndex !== -1) {
+                        pendingTransactions.splice(removeIndex, 1);
+                    }
+                    
+                    // Check for successful exploitation after deduction
+                    // Flag revealed if balance went negative OR multiple checked transactions exist
+                    const checkedCount = pendingTransactions.filter(tx => tx.checked === true).length;
+                    if (balance < 0 || checkedCount > 1) {
                         revealFlag();
                     }
-                }, 100 + Math.random() * 100);
+                }, 80 + Math.random() * 80); // Delayed deduction 80-160ms
                 
                 const resultDiv = document.getElementById('purchase-result');
                 if (resultDiv) {
                     resultDiv.innerHTML = '<div class="flag-message success">Purchase queued (TX: ' + txId + '). Balance will be deducted shortly.</div>';
                 }
             } else {
+                // Remove failed transaction
+                const removeIndex = pendingTransactions.findIndex(tx => tx.txId === txId);
+                if (removeIndex !== -1) {
+                    pendingTransactions.splice(removeIndex, 1);
+                }
+                
                 const resultDiv = document.getElementById('purchase-result');
                 if (resultDiv) {
-                    resultDiv.innerHTML = '<div class="flag-message error">Insufficient balance! You need ' + itemCost + ' tokens, but only have ' + balance + '.</div>';
+                    resultDiv.innerHTML = '<div class="flag-message error">Insufficient balance! You need ' + itemCost + ' tokens, but only have ' + capturedBalance + '.</div>';
                 }
             }
         });
@@ -77,23 +114,21 @@
     }
     
     window.checkFlag = function() {
-        if (balance < 0 || pendingTransactions.length > 1) {
+        const checkedCount = pendingTransactions.filter(tx => tx.checked).length;
+        if (balance < 0 || checkedCount > 1 || (checkedCount > 0 && balance < itemCost && pendingTransactions.length > 0)) {
             revealFlag();
         } else {
             const flagDiv = document.getElementById('flag-reveal');
             if (flagDiv) {
                 flagDiv.classList.remove('hidden');
-                const status = 'Balance: ' + balance + ', Pending TX: ' + pendingTransactions.length;
-                flagDiv.innerHTML = '<div class="flag-message error">Race condition not exploited yet. ' + status + '<br>Try triggering multiple rapid purchases to exploit the timing window.</div>';
+                const status = 'Balance: ' + balance + ', Pending TX: ' + pendingTransactions.length + ', Checked: ' + checkedCount;
+                flagDiv.innerHTML = '<div class="flag-message error">Race condition not exploited yet. ' + status + '<br>Try triggering multiple rapid purchases (use for loop or exploit functions) to exploit the timing window.</div>';
             }
         }
     };
     
     // Exploit helper: rapid fire purchases
     window.exploitRaceCondition = function() {
-        console.log('Attempting race condition exploit...');
-        console.log('Triggering 10 rapid purchase requests...');
-        
         for (let i = 0; i < 10; i++) {
             setTimeout(() => {
                 makePurchase();
@@ -103,14 +138,9 @@
     
     // Advanced exploit: understand the async timing
     window.advancedExploit = function() {
-        console.log('%cAdvanced Exploit: Understanding Async Race Conditions', 'color: orange; font-weight: bold;');
-        console.log('The vulnerability: balance check and deduction are separate async operations');
-        console.log('If multiple checks complete before any deduction, all will pass');
-        console.log('Solution: Trigger multiple purchases rapidly to exploit the timing window');
-        
-        // Trigger many purchases
-        for (let i = 0; i < 15; i++) {
-            makePurchase();
+        // Trigger many purchases simultaneously (no delay to maximize race condition)
+        for (let i = 0; i < 20; i++) {
+            makePurchase(); // No setTimeout - all trigger immediately
         }
     };
     
@@ -121,11 +151,6 @@
         initialized = true;
         
         updateBalance();
-        
-        console.log('%cRace Condition Exploit Available', 'color: orange; font-weight: bold;');
-        console.log('Try calling exploitRaceCondition() or advancedExploit() in the console');
-        console.log('Or rapidly click the purchase button multiple times');
-        console.log('The flag will only be revealed if you successfully exploit the race condition');
     }
     
     // Single initialization path
