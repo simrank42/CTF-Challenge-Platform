@@ -3,11 +3,11 @@
     <p>You've intercepted an encrypted message. The encryption system uses multiple layers of encoding with a weak key derivation mechanism. Can you decrypt it?</p>
     
     <div class="info-box">
-        <strong>Challenge:</strong> The flag has been encrypted using multiple encoding layers. The encryption key is weak and can be found in the page source or through careful analysis.
+        <strong>Challenge:</strong> The flag has been encrypted using a custom multi-layer encryption algorithm with key derivation. The encryption involves XOR, custom substitution, reversal, hex encoding, and double Base64 encoding. The key is encoded and hidden - you must reverse engineer the encryption process to decrypt the flag.
     </div>
     
     <div class="warning-box">
-        <strong>Note:</strong> This is a medium-high difficulty challenge. You may need to use browser DevTools and encoding tools.
+        <strong>Note:</strong> This challenge requires advanced cryptographic knowledge and analysis skills.
     </div>
     
     <h3>Encrypted Message</h3>
@@ -34,7 +34,7 @@
                 Hint 1 <span id="hint-1-arrow">▼</span>
             </button>
             <div id="hint-1" class="hint-content hidden">
-                The encryption uses Base64, ROT13, and Hex encoding in sequence. Look for the key in the page source.
+                The encryption uses multiple layers: XOR cipher, custom substitution (Caesar-like), string reversal, hex encoding, and double Base64 encoding. The key is base64 encoded in HTML comments.
             </div>
         </div>
         <div class="hint-item">
@@ -42,18 +42,10 @@
                 Hint 2 <span id="hint-2-arrow">▼</span>
             </button>
             <div id="hint-2" class="hint-content hidden">
-                Check the JavaScript source code for the encryption key. The key derivation function has a flaw - it uses a simple string concatenation.
+                The key derivation function shows that the key source is base64 encoded. Decode the base64 strings in HTML comments to find the key source. Reverse the encryption steps in order: Base64 decode twice, hex decode, reverse string, reverse substitution, reverse XOR.
             </div>
         </div>
     </div>
 </div>
 
-<script>
-function toggleHint(hintId) {
-    const hint = document.getElementById(hintId);
-    const arrow = document.getElementById(hintId + '-arrow');
-    hint.classList.toggle('hidden');
-    arrow.textContent = hint.classList.contains('hidden') ? '▼' : '▲';
-}
-</script>
 

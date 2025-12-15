@@ -3,11 +3,11 @@
     <p>A critical security configuration has been exposed through obfuscated JavaScript code. Deobfuscate the code to reveal the hidden secrets.</p>
     
     <div class="info-box">
-        <strong>Challenge:</strong> The JavaScript code below is heavily obfuscated. It contains security misconfigurations and exposed secrets. Analyze and deobfuscate it to find the flag.
+        <strong>Challenge:</strong> The JavaScript code is heavily obfuscated using string array lookups and computed property names. The flag has been split into 3 parts, each encoded differently (Base64 reversed, Hex, XOR+Base64). You must deobfuscate the code, execute it, analyze the configuration object, decode each part, and reconstruct the complete flag.
     </div>
     
     <div class="warning-box">
-        <strong>Note:</strong> This is a medium-high difficulty challenge. You may need to use browser DevTools, deobfuscation tools, or manual analysis.
+        <strong>Note:</strong> This challenge requires deep understanding of JavaScript execution and code analysis techniques.
     </div>
     
     <h3>Obfuscated Code</h3>
@@ -36,7 +36,7 @@
                 Hint 1 <span id="hint-1-arrow">▼</span>
             </button>
             <div id="hint-1" class="hint-content hidden">
-                The obfuscation uses string arrays and simple transformations. Try to identify the pattern and reverse it.
+                The obfuscation uses string arrays (_0x1a2b, _0x3c4d) and computed property names. Execute the code to see the actual config object. The flag parts are stored in properties like flagpart1, secretpart2, exposedpart3, and also in metadata hashes.
             </div>
         </div>
         <div class="hint-item">
@@ -44,33 +44,33 @@
                 Hint 2 <span id="hint-2-arrow">▼</span>
             </button>
             <div id="hint-2" class="hint-content hidden">
-                Check what the code actually does when executed. Look for exposed secrets or API keys that shouldn't be in client-side code.
+                After executing, check the config object's properties. Part 1 is Base64 encoded then reversed. Part 2 is hex encoded. Part 3 is XORed (0x55) then Base64 encoded with '|' separators. Decode each part and combine them in order.
             </div>
         </div>
     </div>
 </div>
 
 <script>
-function toggleHint(hintId) {
-    const hint = document.getElementById(hintId);
-    const arrow = document.getElementById(hintId + '-arrow');
-    hint.classList.toggle('hidden');
-    arrow.textContent = hint.classList.contains('hidden') ? '▼' : '▲';
-}
-
-function executeObfuscatedCode() {
+// Make executeObfuscatedCode available globally
+window.executeObfuscatedCode = function() {
     const resultDiv = document.getElementById('execution-result');
     if (!window.obfuscatedFunction) {
-        resultDiv.innerHTML = '<div class="flag-message error">Obfuscated function not loaded. Check the page source.</div>';
+        if (resultDiv) {
+            resultDiv.innerHTML = '<div class="flag-message error">Obfuscated function not loaded. Check the page source.</div>';
+        }
         return;
     }
     
     try {
         const result = window.obfuscatedFunction();
-        resultDiv.innerHTML = `<div class="flag-message success">Execution result: ${result}</div>`;
+        if (resultDiv) {
+            resultDiv.innerHTML = `<div class="flag-message success">Execution result: ${result}</div>`;
+        }
     } catch (e) {
-        resultDiv.innerHTML = `<div class="flag-message error">Error: ${e.message}</div>`;
+        if (resultDiv) {
+            resultDiv.innerHTML = `<div class="flag-message error">Error: ${e.message}</div>`;
+        }
     }
-}
+};
 </script>
 

@@ -3,14 +3,55 @@ const ProgressManager = {
     STORAGE_KEY: 'ctf_progress',
     
     init() {
-        if (!localStorage.getItem(this.STORAGE_KEY)) {
-            this.reset();
+        try {
+            if (!localStorage.getItem(this.STORAGE_KEY)) {
+                this.reset();
+            }
+        } catch (e) {
+            console.warn('localStorage not available:', e);
         }
     },
     
     getProgress() {
-        const data = localStorage.getItem(this.STORAGE_KEY);
-        return data ? JSON.parse(data) : {
+        try {
+            const data = localStorage.getItem(this.STORAGE_KEY);
+            if (!data) {
+                return this.getDefaultProgress();
+            }
+            
+            const parsed = JSON.parse(data);
+            
+            // Validate structure
+            if (typeof parsed !== 'object' || parsed === null) {
+                console.warn('Invalid progress data structure, resetting');
+                this.reset();
+                return this.getDefaultProgress();
+            }
+            
+            // Ensure required fields exist with correct types
+            const progress = {
+                completed: Array.isArray(parsed.completed) ? parsed.completed : [],
+                score: typeof parsed.score === 'number' ? parsed.score : 0,
+                attempts: typeof parsed.attempts === 'object' && parsed.attempts !== null ? parsed.attempts : {},
+                timestamps: typeof parsed.timestamps === 'object' && parsed.timestamps !== null ? parsed.timestamps : {}
+            };
+            
+            // Ensure completed is array of strings
+            progress.completed = progress.completed.filter(id => typeof id === 'string');
+            
+            // Ensure score is non-negative
+            progress.score = Math.max(0, progress.score);
+            
+            return progress;
+        } catch (e) {
+            console.error('Error reading progress:', e);
+            this.reset();
+            return this.getDefaultProgress();
+        }
+    },
+    
+    getDefaultProgress() {
+        return {
             completed: [],
             score: 0,
             attempts: {},
@@ -19,7 +60,16 @@ const ProgressManager = {
     },
     
     saveProgress(progress) {
-        localStorage.setItem(this.STORAGE_KEY, JSON.stringify(progress));
+        try {
+            localStorage.setItem(this.STORAGE_KEY, JSON.stringify(progress));
+        } catch (e) {
+            if (e.name === 'QuotaExceededError') {
+                console.error('localStorage quota exceeded. Progress not saved.');
+                alert('Storage quota exceeded. Progress may not be saved. Please free up space.');
+            } else {
+                console.error('Error saving progress:', e);
+            }
+        }
     },
     
     isCompleted(challengeId) {
@@ -53,12 +103,7 @@ const ProgressManager = {
     },
     
     reset() {
-        const defaultProgress = {
-            completed: [],
-            score: 0,
-            attempts: {},
-            timestamps: {}
-        };
+        const defaultProgress = this.getDefaultProgress();
         this.saveProgress(defaultProgress);
     },
     

@@ -1,73 +1,145 @@
-// Security Misconfiguration Challenge - Obfuscated JavaScript
+// Security Misconfiguration Challenge - Expert level with advanced obfuscation
 (function() {
     const flag = 'CTF{0bfusc4t3d_S3cr3ts_Exp05ed}';
     
-    // Exposed secret (this is the misconfiguration)
+    // Split flag into parts
+    const flagPart1 = flag.substring(0, 12);  // CTF{0bfusc4
+    const flagPart2 = flag.substring(12, 23); // t3d_S3cr3
+    const flagPart3 = flag.substring(23);     // ts_Exp05ed}
+    
+    // Encode each part differently
+    const encodedPart1 = btoa(flagPart1).split('').reverse().join('');
+    const encodedPart2 = Array.from(flagPart2).map(c => c.charCodeAt(0).toString(16)).join('');
+    const encodedPart3 = flagPart3.split('').map(c => String.fromCharCode(c.charCodeAt(0) ^ 0x55)).map(c => btoa(c)).join('|');
+    
+    // Advanced obfuscation with string arrays
+    const _0x1a2b = ['flag', 'secret', 'exposed', 'config', 'api', 'key', 'password'];
+    const _0x3c4d = ['part1', 'part2', 'part3', 'encoded', 'decoded'];
+    const _0x5e6f = ['base64', 'hex', 'xor', 'rot', 'substitute'];
+    
+    const _0x8g9h = function(_0xa0b1, _0xc2d3) {
+        _0xa0b1 = _0xa0b1 - 0x0;
+        let _0xe4f5 = _0x1a2b[_0xa0b1 % _0x1a2b.length];
+        return _0xe4f5;
+    };
+    
+    const _0x6g7h = function(_0xa0b1) {
+        let _0xc2d3 = _0x3c4d[_0xa0b1 % _0x3c4d.length];
+        return _0xc2d3;
+    };
+    
+    // Exposed configuration with encoded flag parts
     const exposedSecret = 'API_KEY_EXPOSED_12345';
     const dbPassword = 'admin_password_weak';
     
-    // Obfuscated function using string arrays and transformations
-    const _0x1a2b = ['flag', 'secret', 'exposed', 'config', 'api'];
-    const _0x3c4d = function(_0x5e6f, _0x7g8h) {
-        _0x5e6f = _0x5e6f - 0x0;
-        let _0x9i0j = _0x1a2b[_0x5e6f];
-        return _0x9i0j;
-    };
-    
     // Heavily obfuscated function
     window.obfuscatedFunction = function() {
-        const _0xa = _0x3c4d('0x0');
-        const _0xb = _0x3c4d('0x1');
-        const _0xc = _0x3c4d('0x2');
+        const _0xa = _0x8g9h('0x0'); // 'flag'
+        const _0xb = _0x8g9h('0x1'); // 'secret'
+        const _0xc = _0x8g9h('0x2'); // 'exposed'
         
-        // Exposed configuration
+        // Config with encoded flag parts hidden in different properties
         const config = {
             apiKey: exposedSecret,
             dbPassword: dbPassword,
             debug: true,
-            flag: flag
+            [_0xa + _0x6g7h(0)]: encodedPart1,  // flagpart1
+            [_0xb + _0x6g7h(1)]: encodedPart2,  // secretpart2
+            [_0xc + _0x6g7h(2)]: encodedPart3,  // exposedpart3
+            checksum: encodedPart1 + encodedPart2,
+            signature: encodedPart2 + encodedPart3,
+            metadata: {
+                hash1: encodedPart1,
+                hash2: encodedPart2,
+                hash3: encodedPart3
+            }
         };
         
-        // Logging misconfiguration - should not expose secrets
         console.log('Config loaded:', config);
-        console.error('Security Misconfiguration: API key exposed in client code!', exposedSecret);
-        console.warn('Database password in frontend:', dbPassword);
+        console.error('Security Misconfiguration detected:', _0xb);
+        console.warn('Exposed data:', config.metadata);
         
-        return 'Configuration loaded. Check console for details.';
+        return 'Configuration loaded. Analyze all properties carefully.';
     };
     
     // Display obfuscated code
-    document.addEventListener('DOMContentLoaded', function() {
+    let initialized = false;
+    function initChallenge() {
+        // Prevent double initialization
+        if (initialized) return;
+        initialized = true;
+        
         const obfuscatedCode = document.getElementById('obfuscated-code');
         if (obfuscatedCode) {
-            obfuscatedCode.textContent = `const _0x1a2b=['flag','secret','exposed','config','api'];
-const _0x3c4d=function(_0x5e6f,_0x7g8h){
-    _0x5e6f=_0x5e6f-0x0;
-    let _0x9i0j=_0x1a2b[_0x5e6f];
-    return _0x9i0j;
+            obfuscatedCode.textContent = `const _0x1a2b=['flag','secret','exposed','config','api','key','password'];
+const _0x3c4d=['part1','part2','part3','encoded','decoded'];
+const _0x8g9h=function(_0xa0b1,_0xc2d3){
+    _0xa0b1=_0xa0b1-0x0;
+    let _0xe4f5=_0x1a2b[_0xa0b1%_0x1a2b.length];
+    return _0xe4f5;
+};
+const _0x6g7h=function(_0xa0b1){
+    let _0xc2d3=_0x3c4d[_0xa0b1%_0x3c4d.length];
+    return _0xc2d3;
 };
 function obfuscatedFunction(){
-    const _0xa=_0x3c4d('0x0');
-    const _0xb=_0x3c4d('0x1');
-    const _0xc=_0x3c4d('0x2');
+    const _0xa=_0x8g9h('0x0');
+    const _0xb=_0x8g9h('0x1');
+    const _0xc=_0x8g9h('0x2');
     const config={
         apiKey:'${exposedSecret}',
         dbPassword:'${dbPassword}',
         debug:true,
-        flag:'${flag}'
+        [_0xa+_0x6g7h(0)]:'${encodedPart1}',
+        [_0xb+_0x6g7h(1)]:'${encodedPart2}',
+        [_0xc+_0x6g7h(2)]:'${encodedPart3}',
+        checksum:'${encodedPart1+encodedPart2}',
+        signature:'${encodedPart2+encodedPart3}',
+        metadata:{hash1:'${encodedPart1}',hash2:'${encodedPart2}',hash3:'${encodedPart3}'}
     };
     console.log('Config loaded:',config);
-    console.error('Security Misconfiguration:',exposedSecret);
     return 'Configuration loaded.';
 }`;
         }
         
-        // Also expose it in a way that can be discovered
+        // Expose config globally for analysis
         window.configMisconfiguration = {
             secret: exposedSecret,
             password: dbPassword,
-            flag: flag
+            part1: encodedPart1,
+            part2: encodedPart2,
+            part3: encodedPart3
         };
-    });
+        
+        // Also hide in HTML comment (only add once - check by content)
+        let commentExists = false;
+        const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_COMMENT, null, false);
+        let node;
+        while (node = walker.nextNode()) {
+            if (node.nodeValue && node.nodeValue.includes('Flag parts:')) {
+                commentExists = true;
+                break;
+            }
+        }
+        
+        if (!commentExists) {
+            const comment = document.createComment(` Flag parts: ${encodedPart1}|${encodedPart2}|${encodedPart3} `);
+            document.body.appendChild(comment);
+        }
+    }
+    
+    // Single initialization path
+    function attemptInit() {
+        const obfuscatedCode = document.getElementById('obfuscated-code');
+        if (obfuscatedCode || document.readyState === 'complete') {
+            setTimeout(initChallenge, 50);
+        } else if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', initChallenge, { once: true });
+        } else {
+            setTimeout(initChallenge, 100);
+        }
+    }
+    
+    window.initSecurityMisconfiguration = initChallenge;
+    attemptInit();
 })();
-

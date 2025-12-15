@@ -6,7 +6,6 @@ const App = {
             title: 'Cryptographic Failures',
             category: 'CRYPTOGRAPHIC FAILURES',
             description: 'Decrypt the multi-layered encoding to find the flag.',
-            difficulty: 'Medium-High',
             points: 100,
             icon: '🔐'
         },
@@ -15,7 +14,6 @@ const App = {
             title: 'Security Misconfiguration',
             category: 'SECURITY MISCONFIGURATION',
             description: 'Deobfuscate the JavaScript code to reveal hidden secrets.',
-            difficulty: 'Medium-High',
             points: 100,
             icon: '⚙️'
         },
@@ -24,7 +22,6 @@ const App = {
             title: 'Steganography',
             category: 'STEGANOGRAPHY',
             description: 'Find the hidden flag using steganography techniques.',
-            difficulty: 'Medium-High',
             points: 100,
             icon: '🖼️'
         },
@@ -33,7 +30,6 @@ const App = {
             title: 'Insecure Design',
             category: 'INSECURE DESIGN',
             description: 'Exploit the flawed business logic to reveal the flag.',
-            difficulty: 'Medium-High',
             points: 100,
             icon: '⚠️'
         },
@@ -42,7 +38,6 @@ const App = {
             title: 'Logging and Alerting Failures',
             category: 'LOGGING AND ALERTING FAILURES',
             description: 'Extract sensitive information from logs and error messages.',
-            difficulty: 'Medium-High',
             points: 100,
             icon: '📋'
         }
@@ -83,15 +78,23 @@ const App = {
     },
     
     showGallery() {
-        document.getElementById('challenges-container').classList.remove('hidden');
-        document.getElementById('challenge-view').classList.add('hidden');
-        window.location.hash = '';
+        const container = document.getElementById('challenges-container');
+        const challengeView = document.getElementById('challenge-view');
+        if (container && challengeView) {
+            container.classList.remove('hidden');
+            challengeView.classList.add('hidden');
+            window.location.hash = '';
+        }
     },
     
     showChallenge(challengeId) {
-        document.getElementById('challenges-container').classList.add('hidden');
-        document.getElementById('challenge-view').classList.remove('hidden');
-        this.renderChallenge(challengeId);
+        const container = document.getElementById('challenges-container');
+        const challengeView = document.getElementById('challenge-view');
+        if (container && challengeView) {
+            container.classList.add('hidden');
+            challengeView.classList.remove('hidden');
+            this.renderChallenge(challengeId);
+        }
     },
     
     renderChallengeGallery() {
@@ -114,7 +117,6 @@ const App = {
                     </div>
                     <p class="challenge-description">${challenge.description}</p>
                     <div class="challenge-footer">
-                        <span class="difficulty-badge difficulty-${challenge.difficulty.toLowerCase().replace('-', '')}">${challenge.difficulty}</span>
                         <span class="points-badge">${challenge.points} pts</span>
                         ${attempts > 0 ? `<span class="attempts-badge">${attempts} attempt${attempts > 1 ? 's' : ''}</span>` : ''}
                     </div>
@@ -128,16 +130,30 @@ const App = {
     
     renderChallenge(challengeId) {
         const challenge = this.challenges.find(c => c.id === challengeId);
-        if (!challenge) return;
+        if (!challenge) {
+            console.error('Challenge not found:', challengeId);
+            return;
+        }
         
         const container = document.getElementById('challenge-view');
+        if (!container) {
+            console.error('Challenge view container not found');
+            return;
+        }
+        
+        // Escape HTML to prevent XSS (though challenge data is trusted)
+        const escapeHtml = (text) => {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        };
+        
         container.innerHTML = `
             <div class="challenge-page">
                 <button class="btn-back" onclick="App.showGallery()">← Back to Challenges</button>
                 <div class="challenge-page-header">
-                    <h1>${challenge.icon} ${challenge.title}</h1>
-                    <span class="challenge-category">${challenge.category}</span>
-                    <span class="difficulty-badge difficulty-${challenge.difficulty.toLowerCase().replace('-', '')}">${challenge.difficulty}</span>
+                    <h1>${escapeHtml(challenge.icon)} ${escapeHtml(challenge.title)}</h1>
+                    <span class="challenge-category">${escapeHtml(challenge.category)}</span>
                 </div>
                 <div id="challenge-content">
                     <!-- Challenge content will be loaded by individual challenge files -->
@@ -151,17 +167,30 @@ const App = {
     
     loadChallengeContent(challengeId) {
         const contentDiv = document.getElementById('challenge-content');
+        if (!contentDiv) {
+            console.error('Challenge content container not found');
+            return;
+        }
         
         // Load challenge-specific HTML based on ID
         fetch(`challenges/${challengeId}.html`)
-            .then(response => response.text())
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                return response.text();
+            })
             .then(html => {
-                contentDiv.innerHTML = html;
-                this.initializeChallenge(challengeId);
+                if (contentDiv) {
+                    contentDiv.innerHTML = html;
+                    this.initializeChallenge(challengeId);
+                }
             })
             .catch(err => {
                 console.error('Error loading challenge:', err);
-                contentDiv.innerHTML = '<p>Error loading challenge content.</p>';
+                if (contentDiv) {
+                    contentDiv.innerHTML = '<div class="flag-message error">Error loading challenge content. Please try again or refresh the page.</div>';
+                }
             });
     },
     
@@ -169,6 +198,12 @@ const App = {
         // Initialize challenge-specific JavaScript
         const submitBtn = document.getElementById('submit-flag-btn');
         const flagInput = document.getElementById('flag-input');
+        
+        // Reset flag input state (re-enable if disabled)
+        if (flagInput) {
+            flagInput.disabled = false;
+            flagInput.value = '';
+        }
         
         if (submitBtn && flagInput) {
             submitBtn.addEventListener('click', () => {
@@ -182,10 +217,41 @@ const App = {
             });
         }
         
+        // Remove old challenge scripts to prevent memory leak
+        const existingScripts = document.querySelectorAll('script[data-challenge-script]');
+        existingScripts.forEach(script => script.remove());
+        
         // Load challenge-specific JS if it exists
         const script = document.createElement('script');
         script.src = `js/challenges/${challengeId}.js`;
-        script.onerror = () => {}; // Ignore if file doesn't exist
+        script.setAttribute('data-challenge-script', challengeId);
+        script.onerror = () => {
+            console.error(`Failed to load challenge script: ${challengeId}.js`);
+            const contentDiv = document.getElementById('challenge-content');
+            if (contentDiv) {
+                const errorMsg = contentDiv.querySelector('.error-message');
+                if (!errorMsg) {
+                    const errorDiv = document.createElement('div');
+                    errorDiv.className = 'flag-message error error-message';
+                    errorDiv.textContent = 'Error loading challenge script. Please refresh the page.';
+                    contentDiv.insertBefore(errorDiv, contentDiv.firstChild);
+                }
+            }
+        };
+        script.onload = () => {
+            // After script loads, trigger initialization
+            // Each challenge JS defines an init function: init + PascalCase of challenge ID
+            const initFuncName = 'init' + challengeId.split('-').map(word => 
+                word.charAt(0).toUpperCase() + word.slice(1)
+            ).join('');
+            
+            // Give it a moment for the script to fully execute
+            setTimeout(() => {
+                if (window[initFuncName] && typeof window[initFuncName] === 'function') {
+                    window[initFuncName]();
+                }
+            }, 100);
+        };
         document.body.appendChild(script);
     },
     
@@ -241,4 +307,14 @@ if (document.readyState === 'loading') {
 
 // Make App available globally for onclick handlers
 window.App = App;
+
+// Global hint toggle function (works after HTML injection)
+window.toggleHint = function(hintId) {
+    const hint = document.getElementById(hintId);
+    const arrow = document.getElementById(hintId + '-arrow');
+    if (hint && arrow) {
+        hint.classList.toggle('hidden');
+        arrow.textContent = hint.classList.contains('hidden') ? '▼' : '▲';
+    }
+};
 

@@ -3,11 +3,11 @@
     <p>A payment system has a critical design flaw. Exploit the race condition and business logic vulnerability to reveal the flag.</p>
     
     <div class="info-box">
-        <strong>Challenge:</strong> The system below has an insecure design with a race condition vulnerability. Multiple requests can be processed simultaneously, leading to unexpected behavior.
+        <strong>Challenge:</strong> The payment system has a critical race condition in its async transaction processing. The balance check and deduction are separate asynchronous operations with timing delays. By triggering multiple rapid purchases, you can exploit the timing window where checks pass before deductions occur. The flag is only revealed after successfully exploiting this vulnerability.
     </div>
     
     <div class="warning-box">
-        <strong>Note:</strong> This is a medium-high difficulty challenge. You need to understand race conditions and exploit the flawed business logic.
+        <strong>Note:</strong> This challenge requires understanding of race conditions, async programming, and business logic vulnerabilities.
     </div>
     
     <h3>Payment System</h3>
@@ -41,7 +41,7 @@
                 Hint 1 <span id="hint-1-arrow">▼</span>
             </button>
             <div id="hint-1" class="hint-content hidden">
-                Race conditions occur when multiple operations access shared resources simultaneously. Try making multiple rapid requests.
+                The balance check is async with a delay (50-100ms), and the deduction also has a delay (100-200ms). This creates a vulnerability window. If you trigger multiple purchases rapidly (within the window), multiple checks can pass before any deduction occurs. Use exploitRaceCondition() in console or rapidly click the button.
             </div>
         </div>
         <div class="hint-item">
@@ -49,18 +49,10 @@
                 Hint 2 <span id="hint-2-arrow">▼</span>
             </button>
             <div id="hint-2" class="hint-content hidden">
-                The balance check and deduction happen separately. If you trigger multiple purchases quickly, the balance check might pass multiple times before any deduction occurs.
+                The race condition allows multiple transactions to pass the balance check before any balance is actually deducted. You need to trigger enough purchases so that the balance goes negative or multiple transactions are pending. The flag will automatically reveal when the exploitation succeeds (balance < 0 or pendingTransactions.length > 1).
             </div>
         </div>
     </div>
 </div>
 
-<script>
-function toggleHint(hintId) {
-    const hint = document.getElementById(hintId);
-    const arrow = document.getElementById(hintId + '-arrow');
-    hint.classList.toggle('hidden');
-    arrow.textContent = hint.classList.contains('hidden') ? '▼' : '▲';
-}
-</script>
 
