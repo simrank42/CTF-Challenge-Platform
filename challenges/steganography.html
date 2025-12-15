@@ -1,0 +1,63 @@
+<div class="challenge-content">
+    <h2>Steganography Challenge</h2>
+    <p>Information has been hidden using steganography techniques. Can you extract the hidden flag?</p>
+    
+    <div class="info-box">
+        <strong>Challenge:</strong> The flag is hidden using steganography. Look carefully at the page source, CSS, or try different extraction techniques.
+    </div>
+    
+    <div class="warning-box">
+        <strong>Note:</strong> This is a medium-high difficulty challenge. You may need to inspect HTML/CSS carefully or use steganography extraction techniques.
+    </div>
+    
+    <h3>Image with Hidden Data</h3>
+    <div id="stego-container" class="info-box">
+        <p>Look carefully at this image and the page source...</p>
+        <!-- Flag hidden using zero-width characters -->
+        <div style="font-family: monospace; white-space: pre;" id="hidden-text"></div>
+    </div>
+    
+    <h3>CSS Steganography</h3>
+    <div class="warning-box">
+        <p>Sometimes data is hidden in CSS whitespace or other invisible characters. Inspect the CSS carefully.</p>
+    </div>
+    
+    <div class="flag-submission">
+        <h3>Submit Flag</h3>
+        <div class="flag-input-group">
+            <input type="text" id="flag-input" placeholder="CTF{...}" />
+            <button class="btn-submit" id="submit-flag-btn">Submit</button>
+        </div>
+        <div id="flag-result" class="hidden"></div>
+    </div>
+    
+    <div class="hints-section">
+        <h3>Hints</h3>
+        <div class="hint-item">
+            <button class="hint-toggle" onclick="toggleHint('hint-1')">
+                Hint 1 <span id="hint-1-arrow">▼</span>
+            </button>
+            <div id="hint-1" class="hint-content hidden">
+                Look for zero-width characters or whitespace steganography. Check the HTML source and CSS for hidden characters.
+            </div>
+        </div>
+        <div class="hint-item">
+            <button class="hint-toggle" onclick="toggleHint('hint-2')">
+                Hint 2 <span id="hint-2-arrow">▼</span>
+            </button>
+            <div id="hint-2" class="hint-content hidden">
+                Try copying the text from the page and analyzing it. Zero-width spaces (U+200B) and zero-width non-joiner (U+200C) can encode binary data.
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function toggleHint(hintId) {
+    const hint = document.getElementById(hintId);
+    const arrow = document.getElementById(hintId + '-arrow');
+    hint.classList.toggle('hidden');
+    arrow.textContent = hint.classList.contains('hidden') ? '▼' : '▲';
+}
+</script>
+

@@ -1,0 +1,66 @@
+<div class="challenge-content">
+    <h2>Insecure Design Challenge</h2>
+    <p>A payment system has a critical design flaw. Exploit the race condition and business logic vulnerability to reveal the flag.</p>
+    
+    <div class="info-box">
+        <strong>Challenge:</strong> The system below has an insecure design with a race condition vulnerability. Multiple requests can be processed simultaneously, leading to unexpected behavior.
+    </div>
+    
+    <div class="warning-box">
+        <strong>Note:</strong> This is a medium-high difficulty challenge. You need to understand race conditions and exploit the flawed business logic.
+    </div>
+    
+    <h3>Payment System</h3>
+    <div class="info-box">
+        <p>You have a balance of <strong id="balance">100</strong> tokens.</p>
+        <p>You need to purchase an item that costs <strong>150</strong> tokens.</p>
+        <p>The system has a race condition - can you exploit it?</p>
+    </div>
+    
+    <div class="flag-submission" style="margin-top: 2rem;">
+        <h3>Actions</h3>
+        <button class="btn-submit" onclick="makePurchase()">Purchase Item (150 tokens)</button>
+        <button class="btn-submit" onclick="checkFlag()" style="margin-left: 1rem;">Check for Flag</button>
+        <div id="purchase-result" class="mt-2"></div>
+        <div id="flag-reveal" class="hidden mt-2"></div>
+    </div>
+    
+    <h3>Flag Submission</h3>
+    <div class="flag-submission">
+        <div class="flag-input-group">
+            <input type="text" id="flag-input" placeholder="CTF{...}" />
+            <button class="btn-submit" id="submit-flag-btn">Submit</button>
+        </div>
+        <div id="flag-result" class="hidden"></div>
+    </div>
+    
+    <div class="hints-section">
+        <h3>Hints</h3>
+        <div class="hint-item">
+            <button class="hint-toggle" onclick="toggleHint('hint-1')">
+                Hint 1 <span id="hint-1-arrow">▼</span>
+            </button>
+            <div id="hint-1" class="hint-content hidden">
+                Race conditions occur when multiple operations access shared resources simultaneously. Try making multiple rapid requests.
+            </div>
+        </div>
+        <div class="hint-item">
+            <button class="hint-toggle" onclick="toggleHint('hint-2')">
+                Hint 2 <span id="hint-2-arrow">▼</span>
+            </button>
+            <div id="hint-2" class="hint-content hidden">
+                The balance check and deduction happen separately. If you trigger multiple purchases quickly, the balance check might pass multiple times before any deduction occurs.
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function toggleHint(hintId) {
+    const hint = document.getElementById(hintId);
+    const arrow = document.getElementById(hintId + '-arrow');
+    hint.classList.toggle('hidden');
+    arrow.textContent = hint.classList.contains('hidden') ? '▼' : '▲';
+}
+</script>
+

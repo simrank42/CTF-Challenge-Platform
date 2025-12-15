@@ -1,0 +1,69 @@
+<div class="challenge-content">
+    <h2>Logging and Alerting Failures Challenge</h2>
+    <p>Sensitive information has been exposed through improper logging and error handling. Extract the flag from logs and error messages.</p>
+    
+    <div class="info-box">
+        <strong>Challenge:</strong> The application below logs sensitive information and exposes data through error messages. Find the flag by examining console logs, error messages, and debug information.
+    </div>
+    
+    <div class="warning-box">
+        <strong>Note:</strong> This is a medium-high difficulty challenge. Open your browser's DevTools console and network tab to find exposed information.
+    </div>
+    
+    <h3>Application Interface</h3>
+    <div class="info-box">
+        <p>Try interacting with the application below. Watch the console for logged information.</p>
+        <button class="btn-submit" onclick="triggerError()">Trigger Error</button>
+        <button class="btn-submit" onclick="makeRequest()" style="margin-left: 1rem;">Make Request</button>
+        <button class="btn-submit" onclick="debugMode()" style="margin-left: 1rem;">Debug Mode</button>
+        <div id="app-output" class="mt-2"></div>
+    </div>
+    
+    <div class="warning-box mt-2">
+        <strong>Important:</strong> Open your browser's Developer Tools (F12) and check:
+        <ul style="margin-top: 0.5rem; padding-left: 1.5rem;">
+            <li>Console tab for logged messages</li>
+            <li>Network tab for request/response data</li>
+            <li>Error messages for stack traces</li>
+        </ul>
+    </div>
+    
+    <div class="flag-submission">
+        <h3>Submit Flag</h3>
+        <div class="flag-input-group">
+            <input type="text" id="flag-input" placeholder="CTF{...}" />
+            <button class="btn-submit" id="submit-flag-btn">Submit</button>
+        </div>
+        <div id="flag-result" class="hidden"></div>
+    </div>
+    
+    <div class="hints-section">
+        <h3>Hints</h3>
+        <div class="hint-item">
+            <button class="hint-toggle" onclick="toggleHint('hint-1')">
+                Hint 1 <span id="hint-1-arrow">▼</span>
+            </button>
+            <div id="hint-1" class="hint-content hidden">
+                Sensitive data is often logged through console.log(), console.error(), or exposed in error stack traces. Check all console messages carefully.
+            </div>
+        </div>
+        <div class="hint-item">
+            <button class="hint-toggle" onclick="toggleHint('hint-2')">
+                Hint 2 <span id="hint-2-arrow">▼</span>
+            </button>
+            <div id="hint-2" class="hint-content hidden">
+                Try triggering errors and check what information is exposed. Debug mode often logs more information than production mode.
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function toggleHint(hintId) {
+    const hint = document.getElementById(hintId);
+    const arrow = document.getElementById(hintId + '-arrow');
+    hint.classList.toggle('hidden');
+    arrow.textContent = hint.classList.contains('hidden') ? '▼' : '▲';
+}
+</script>
+

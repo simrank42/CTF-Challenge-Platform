@@ -1,0 +1,59 @@
+<div class="challenge-content">
+    <h2>Cryptographic Failures Challenge</h2>
+    <p>You've intercepted an encrypted message. The encryption system uses multiple layers of encoding with a weak key derivation mechanism. Can you decrypt it?</p>
+    
+    <div class="info-box">
+        <strong>Challenge:</strong> The flag has been encrypted using multiple encoding layers. The encryption key is weak and can be found in the page source or through careful analysis.
+    </div>
+    
+    <div class="warning-box">
+        <strong>Note:</strong> This is a medium-high difficulty challenge. You may need to use browser DevTools and encoding tools.
+    </div>
+    
+    <h3>Encrypted Message</h3>
+    <div id="encrypted-message" class="info-box">
+        <code id="encrypted-text"></code>
+    </div>
+    
+    <h3>Key Derivation Function (Weak Implementation)</h3>
+    <pre id="key-derivation-code"></pre>
+    
+    <div class="flag-submission">
+        <h3>Submit Flag</h3>
+        <div class="flag-input-group">
+            <input type="text" id="flag-input" placeholder="CTF{...}" />
+            <button class="btn-submit" id="submit-flag-btn">Submit</button>
+        </div>
+        <div id="flag-result" class="hidden"></div>
+    </div>
+    
+    <div class="hints-section">
+        <h3>Hints</h3>
+        <div class="hint-item">
+            <button class="hint-toggle" onclick="toggleHint('hint-1')">
+                Hint 1 <span id="hint-1-arrow">▼</span>
+            </button>
+            <div id="hint-1" class="hint-content hidden">
+                The encryption uses Base64, ROT13, and Hex encoding in sequence. Look for the key in the page source.
+            </div>
+        </div>
+        <div class="hint-item">
+            <button class="hint-toggle" onclick="toggleHint('hint-2')">
+                Hint 2 <span id="hint-2-arrow">▼</span>
+            </button>
+            <div id="hint-2" class="hint-content hidden">
+                Check the JavaScript source code for the encryption key. The key derivation function has a flaw - it uses a simple string concatenation.
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function toggleHint(hintId) {
+    const hint = document.getElementById(hintId);
+    const arrow = document.getElementById(hintId + '-arrow');
+    hint.classList.toggle('hidden');
+    arrow.textContent = hint.classList.contains('hidden') ? '▼' : '▲';
+}
+</script>
+

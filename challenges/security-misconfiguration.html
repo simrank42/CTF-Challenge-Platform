@@ -1,0 +1,76 @@
+<div class="challenge-content">
+    <h2>Security Misconfiguration Challenge</h2>
+    <p>A critical security configuration has been exposed through obfuscated JavaScript code. Deobfuscate the code to reveal the hidden secrets.</p>
+    
+    <div class="info-box">
+        <strong>Challenge:</strong> The JavaScript code below is heavily obfuscated. It contains security misconfigurations and exposed secrets. Analyze and deobfuscate it to find the flag.
+    </div>
+    
+    <div class="warning-box">
+        <strong>Note:</strong> This is a medium-high difficulty challenge. You may need to use browser DevTools, deobfuscation tools, or manual analysis.
+    </div>
+    
+    <h3>Obfuscated Code</h3>
+    <pre id="obfuscated-code"></pre>
+    
+    <h3>Code Execution</h3>
+    <div class="info-box">
+        <p>Try executing the code in the browser console to see what it does. Look for exposed API keys, secrets, or misconfigurations.</p>
+        <button class="btn-submit" onclick="executeObfuscatedCode()">Execute Code</button>
+        <div id="execution-result" class="mt-2"></div>
+    </div>
+    
+    <div class="flag-submission">
+        <h3>Submit Flag</h3>
+        <div class="flag-input-group">
+            <input type="text" id="flag-input" placeholder="CTF{...}" />
+            <button class="btn-submit" id="submit-flag-btn">Submit</button>
+        </div>
+        <div id="flag-result" class="hidden"></div>
+    </div>
+    
+    <div class="hints-section">
+        <h3>Hints</h3>
+        <div class="hint-item">
+            <button class="hint-toggle" onclick="toggleHint('hint-1')">
+                Hint 1 <span id="hint-1-arrow">▼</span>
+            </button>
+            <div id="hint-1" class="hint-content hidden">
+                The obfuscation uses string arrays and simple transformations. Try to identify the pattern and reverse it.
+            </div>
+        </div>
+        <div class="hint-item">
+            <button class="hint-toggle" onclick="toggleHint('hint-2')">
+                Hint 2 <span id="hint-2-arrow">▼</span>
+            </button>
+            <div id="hint-2" class="hint-content hidden">
+                Check what the code actually does when executed. Look for exposed secrets or API keys that shouldn't be in client-side code.
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function toggleHint(hintId) {
+    const hint = document.getElementById(hintId);
+    const arrow = document.getElementById(hintId + '-arrow');
+    hint.classList.toggle('hidden');
+    arrow.textContent = hint.classList.contains('hidden') ? '▼' : '▲';
+}
+
+function executeObfuscatedCode() {
+    const resultDiv = document.getElementById('execution-result');
+    if (!window.obfuscatedFunction) {
+        resultDiv.innerHTML = '<div class="flag-message error">Obfuscated function not loaded. Check the page source.</div>';
+        return;
+    }
+    
+    try {
+        const result = window.obfuscatedFunction();
+        resultDiv.innerHTML = `<div class="flag-message success">Execution result: ${result}</div>`;
+    } catch (e) {
+        resultDiv.innerHTML = `<div class="flag-message error">Error: ${e.message}</div>`;
+    }
+}
+</script>
+

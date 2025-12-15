@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CTF Challenge Platform</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>CTF Challenge Platform</h1>
+            <p class="subtitle">Test your security skills with medium-to-high difficulty challenges</p>
+        </header>
+
+        <div class="progress-dashboard">
+            <div class="progress-stats">
+                <div class="stat">
+                    <span class="stat-label">Completed</span>
+                    <div class="stat-value-container">
+                        <span class="stat-value" id="completed-count">0</span><span class="stat-total">/5</span>
+                    </div>
+                </div>
+                <div class="stat">
+                    <span class="stat-label">Score</span>
+                    <span class="stat-value" id="total-score">0</span>
+                </div>
+                <button class="btn-reset" id="reset-btn">Reset Progress</button>
+            </div>
+        </div>
+
+        <div class="challenges-grid" id="challenges-container">
+            <!-- Challenges will be dynamically loaded -->
+        </div>
+
+        <div id="challenge-view" class="challenge-view hidden">
+            <!-- Individual challenge will be loaded here -->
+        </div>
+    </div>
+
+    <script src="js/progress.js"></script>
+    <script src="js/flag-validator.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>
+
