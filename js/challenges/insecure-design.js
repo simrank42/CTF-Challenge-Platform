@@ -122,7 +122,7 @@
             if (flagDiv) {
                 flagDiv.classList.remove('hidden');
                 const status = 'Balance: ' + balance + ', Pending TX: ' + pendingTransactions.length + ', Checked: ' + checkedCount;
-                flagDiv.innerHTML = '<div class="flag-message error">Race condition not exploited yet. ' + status + '<br>Try triggering multiple rapid purchases (use for loop or exploit functions) to exploit the timing window.</div>';
+                flagDiv.innerHTML = '<div class="flag-message error">Race condition not exploited yet. ' + status + '<br>Try triggering multiple rapid purchases.</div>';
             }
         }
     };
